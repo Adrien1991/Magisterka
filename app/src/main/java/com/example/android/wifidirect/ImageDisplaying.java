@@ -66,6 +66,8 @@ public class ImageDisplaying extends Activity implements View.OnTouchListener{
     public boolean onTouch(View view, MotionEvent event) {
         final int X = (int) event.getRawX();
         final int Y = (int) event.getRawY();
+        int imageRight = jpgView.getMaxWidth();
+        int imageBottom = jpgView.getMaxHeight();
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
                 RelativeLayout.LayoutParams lParams = (RelativeLayout.LayoutParams) view.getLayoutParams();
@@ -80,10 +82,10 @@ public class ImageDisplaying extends Activity implements View.OnTouchListener{
                 break;
             case MotionEvent.ACTION_MOVE:
                 RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) view.getLayoutParams();
-                layoutParams.leftMargin = X - _xDelta;
-                layoutParams.topMargin = Y - _yDelta;
-                layoutParams.rightMargin = -1000000;
-                layoutParams.bottomMargin = -1000000;
+                int lewy = layoutParams.leftMargin = X - _xDelta;
+                int gorny = layoutParams.topMargin = Y - _yDelta;
+                layoutParams.rightMargin = lewy + imageRight;
+                layoutParams.bottomMargin = gorny +imageBottom;
                 view.setLayoutParams(layoutParams);
                 break;
         }
