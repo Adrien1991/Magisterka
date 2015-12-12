@@ -47,11 +47,12 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+
 /**
  * A fragment that manages a particular peer and allows interaction with device
  * i.e. setting up network connection and transferring data.
  */
-public class DeviceDetailFragment extends Fragment implements ConnectionInfoListener {
+public class DUPA extends Fragment implements ConnectionInfoListener {
 
 
 
@@ -139,9 +140,7 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-
-
-        // User has picked an image. Transfer it to group owner i.e peer using
+         // User has picked an image. Transfer it to group owner i.e peer using
         // FileTransferService.
         uri = data.getData();
         TextView statusText = (TextView) mContentView.findViewById(R.id.status_text);
