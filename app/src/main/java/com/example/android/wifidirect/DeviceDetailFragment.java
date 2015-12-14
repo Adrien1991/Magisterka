@@ -22,6 +22,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.Image;
 import android.net.Uri;
 import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
@@ -36,9 +37,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.wifidirect.DeviceListFragment.DeviceActionListener;
 
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -52,7 +55,7 @@ import java.net.Socket;
  * A fragment that manages a particular peer and allows interaction with device
  * i.e. setting up network connection and transferring data.
  */
-public class DUPA extends Fragment implements ConnectionInfoListener {
+public class DeviceDetailFragment extends Fragment implements ConnectionInfoListener {
 
 
 
@@ -245,6 +248,7 @@ public class DUPA extends Fragment implements ConnectionInfoListener {
         public static Context context;
         private TextView statusText;
         public static Intent intentP = null;
+        public static int wartosc;
 
         /**
          * @param context
@@ -257,10 +261,13 @@ public class DUPA extends Fragment implements ConnectionInfoListener {
 
         @Override
         protected String doInBackground(Void... params) {
+            ServerSocket serverSocket = null;
+            Socket client = null;
+            DataInputStream inputStreamString = null;
             try {
-                ServerSocket serverSocket = new ServerSocket(8988);
+                serverSocket = new ServerSocket(8988);
                 Log.d(WiFiDirectActivity.TAG, "Serwer: Połęczenie otwarto");
-                Socket client = serverSocket.accept();
+                client = serverSocket.accept();
                 Log.d(WiFiDirectActivity.TAG, "Serwer: Połączenie nawiązano");
                 final File f = new File(Environment.getExternalStorageDirectory() + "/"
                         + context.getPackageName() + "/wifip2pshared-" + System.currentTimeMillis()
@@ -272,14 +279,26 @@ public class DUPA extends Fragment implements ConnectionInfoListener {
                 f.createNewFile();
 
                 Log.d(WiFiDirectActivity.TAG, "Serwer: Kopiowanie plików " + f.toString());
-                InputStream inputstream = client.getInputStream();
-                copyFile(inputstream, new FileOutputStream(f));
+                InputStream inputStream = client.getInputStream();
+                copyFile(inputStream, new FileOutputStream(f));
                 serverSocket.close();
                 return f.getAbsolutePath();
             } catch (IOException e) {
                 Log.e(WiFiDirectActivity.TAG, e.getMessage());
-                return null;
             }
+
+            try {
+                serverSocket = new ServerSocket(8988);
+                client = serverSocket.accept();
+                InputStream inputStream = client.getInputStream();
+                wartosc = inputStream.read();
+                serverSocket.close();
+                return String.valueOf(wartosc);
+            } catch (IOException e) {
+                e.printStackTrace();
+
+            }
+            return null;
         }
 
         /*
@@ -294,7 +313,6 @@ public class DUPA extends Fragment implements ConnectionInfoListener {
                 intentP = new Intent(activity.getBaseContext(), ImageDisplaying.class);
                 intentP.setDataAndType(Uri.parse("file://" + result), "image/*");
                 intentP.putExtra(result, Uri.parse("file://" + result));
-
                 context.startActivity(intentP);
             }
 

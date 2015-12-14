@@ -28,8 +28,8 @@ public final class R {
         public static final int section_header=0x7f020006;
     }
     public static final class id {
-        public static final int atn_direct_discover=0x7f080015;
-        public static final int atn_direct_enable=0x7f080014;
+        public static final int atn_direct_discover=0x7f080016;
+        public static final int atn_direct_enable=0x7f080015;
         public static final int btn_connect=0x7f080000;
         public static final int btn_disconnect=0x7f080001;
         public static final int btn_start_client=0x7f080002;
@@ -47,6 +47,7 @@ public final class R {
         public static final int my_name=0x7f08000a;
         public static final int my_status=0x7f08000b;
         public static final int root=0x7f08000d;
+        public static final int server_status=0x7f080014;
         public static final int status_bar=0x7f080007;
         public static final int status_text=0x7f080008;
         public static final int switch1=0x7f08000c;
@@ -57,6 +58,7 @@ public final class R {
         public static final int display=0x7f030002;
         public static final int main=0x7f030003;
         public static final int row_devices=0x7f030004;
+        public static final int server=0x7f030005;
     }
     public static final class menu {
         public static final int action_items=0x7f070000;

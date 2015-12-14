@@ -21,6 +21,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Point;
 import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
@@ -31,10 +32,12 @@ import android.net.wifi.p2p.WifiP2pManager.ChannelListener;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.example.android.wifidirect.DeviceListFragment.DeviceActionListener;
@@ -49,6 +52,8 @@ import com.example.android.wifidirect.DeviceListFragment.DeviceActionListener;
 public class WiFiDirectActivity extends Activity implements ChannelListener, DeviceActionListener {
 
     public static final String TAG = "Screen sharing";
+    public static int screenWidth;
+    public static int screenHeight;
     private WifiP2pManager manager;
     private boolean isWifiP2pEnabled = false;
     private boolean retryChannel = false;
@@ -78,6 +83,14 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
 
         manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         channel = manager.initialize(this, getMainLooper(), null);
+
+
+        WindowManager wm = (WindowManager) getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        screenWidth = size.x;
+        screenHeight = size.y;
     }
 
     /** register the BroadcastReceiver with the intent values to be matched */
@@ -270,4 +283,6 @@ public class WiFiDirectActivity extends Activity implements ChannelListener, Dev
         }
 
     }
+
+
 }
