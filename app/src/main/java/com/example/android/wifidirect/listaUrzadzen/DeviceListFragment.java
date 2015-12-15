@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.wifidirect;
+package com.example.android.wifidirect.listaUrzadzen;
 
 import android.app.ListFragment;
 import android.app.ProgressDialog;
@@ -35,41 +35,45 @@ import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.example.android.wifidirect.R;
+import com.example.android.wifidirect.WiFiDirectActivity;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A ListFragment that displays available peers on discovery and requests the
- * parent activity to handle user interaction events
+ * Fragment, który wyświetla dostępne peery i ich status.
  */
-public class DeviceListFragment extends ListFragment implements PeerListListener {
+public class DeviceListFragment extends ListFragment implements PeerListListener  {
 
-    private List<WifiP2pDevice> peers = new ArrayList<WifiP2pDevice>();
+    public static List<WifiP2pDevice> peers = new ArrayList<WifiP2pDevice>();
+    private List<WifiP2pDevice> items;
+    private WifiP2pDevice device;
     ProgressDialog progressDialog = null;
     View mContentView = null;
-    private WifiP2pDevice device;
-    public static Switch mSwitch;
+    public static Switch groupOwnerSwitch;
 
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         this.setListAdapter(new WiFiPeerListAdapter(getActivity(), R.layout.row_devices, peers));
-        mSwitch = (Switch) mContentView.findViewById(R.id.switch1);
+        groupOwnerSwitch = (Switch) mContentView.findViewById(R.id.switch1);
 
-        mSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        //Switch do ustalania administatora grupy (tzw. groupOwner)
+        //Wartości od 0 do 15, gdzie 15 to raczej Administartor, 0 to raczejClient
+        groupOwnerSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
                 if (isChecked) {
                     WifiP2pConfig config = new WifiP2pConfig();
-                    config.groupOwnerIntent = 15;  //Less probability to become the GO
+                    config.groupOwnerIntent = 15;
 
                 } else {
                     WifiP2pConfig config = new WifiP2pConfig();
-                    config.groupOwnerIntent = 0;  //Less probability to become the GO
-
+                    config.groupOwnerIntent = 0;
                 }
             }
         });
@@ -81,14 +85,15 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
         return mContentView;
     }
 
-    /**
-     * @return this device
-     */
-    public WifiP2pDevice getDevice() {
+    //Gettr, który zwraca urządzenie, nie jego profil, a status w sieci WiFiDirect.
+    public  WifiP2pDevice getDevice() {
         return device;
+
     }
 
-    private static String getDeviceStatus(int deviceStatus) {
+
+    //Switch do statusów dostępnego, znalezionego (ale nie podłączonego!) peera
+    public static String getDeviceStatus(int deviceStatus) {
         Log.d(WiFiDirectActivity.TAG, "Status podłączonych:" + deviceStatus);
         switch (deviceStatus) {
             case WifiP2pDevice.AVAILABLE:
@@ -108,7 +113,7 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
     }
 
     /**
-     * Initiate a connection with the peer.
+     * Prośba o podłączenie (on item list click) peera (albo do administatora)
      */
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
@@ -116,20 +121,17 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
         ((DeviceActionListener) getActivity()).showDetails(device);
     }
 
+
     /**
-     * Array adapter for ListFragment that maintains WifiP2pDevice list.
+     * Adapter wyświetlający listę peerów
      */
     private class WiFiPeerListAdapter extends ArrayAdapter<WifiP2pDevice> {
 
         private List<WifiP2pDevice> items;
 
-        /**
-         * @param context
-         * @param textViewResourceId
-         * @param objects
-         */
+
         public WiFiPeerListAdapter(Context context, int textViewResourceId,
-                List<WifiP2pDevice> objects) {
+                                   List<WifiP2pDevice> objects) {
             super(context, textViewResourceId, objects);
             items = objects;
 
@@ -161,9 +163,8 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
     }
 
     /**
-     * Update UI for this device.
-     * 
-     * @param device WifiP2pDevice object
+
+     * Odświeżanie statusów i dostępnych urządzeń
      */
     public void updateThisDevice(WifiP2pDevice device) {
         this.device = device;
@@ -173,6 +174,7 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
         view.setText(getDeviceStatus(device.status));
     }
 
+    //Lista dostępnych peerów
     @Override
     public void onPeersAvailable(WifiP2pDeviceList peerList) {
         if (progressDialog != null && progressDialog.isShowing()) {
@@ -188,14 +190,13 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
 
     }
 
+    // Czyszczenie listy
     public void clearPeers() {
         peers.clear();
         ((WiFiPeerListAdapter) getListAdapter()).notifyDataSetChanged();
     }
 
-    /**
-     * 
-     */
+    // Zainicjalizowanie poszukiwań urządzeń
     public void onInitiateDiscovery() {
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
@@ -205,24 +206,9 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
 
                     @Override
                     public void onCancel(DialogInterface dialog) {
-                        
+
                     }
                 });
-    }
-
-    /**
-     * An interface-callback for the activity to listen to fragment interaction
-     * events.
-     */
-    public interface DeviceActionListener {
-
-        void showDetails(WifiP2pDevice device);
-
-        void cancelDisconnect();
-
-        void connect(WifiP2pConfig config);
-
-        void disconnect();
     }
 
 }
