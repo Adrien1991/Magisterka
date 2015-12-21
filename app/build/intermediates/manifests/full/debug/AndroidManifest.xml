@@ -14,7 +14,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION" />
 
     <!-- Google Play filtering -->
     <uses-feature
@@ -27,7 +29,7 @@
         android:largeHeap="true"
         android:theme="@android:style/Theme.Holo" >
         <activity
-            android:name="com.example.android.wifidirect.WiFiDirectActivity"
+            android:name="com.example.android.wifidirect.activities.MainActivity"
             android:label="@string/app_name"
             android:launchMode="singleTask" >
             <intent-filter>
@@ -37,7 +39,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.example.android.wifidirect.ImageDisplaying"
+            android:name="com.example.android.wifidirect.activities.ImageDisplaying"
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
@@ -49,7 +51,7 @@
 
         <!-- Used for transferring files  after a successful connection -->
         <service
-            android:name="com.example.android.wifidirect.FileTransferService"
+            android:name="com.example.android.wifidirect.services.WiFiTransferService"
             android:enabled="true" />
     </application>
 

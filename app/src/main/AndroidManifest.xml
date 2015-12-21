@@ -9,7 +9,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION" />
 
     <!-- Google Play filtering --> 
     <uses-feature android:name="android.hardware.wifi.direct" android:required="true"/>
@@ -20,7 +22,7 @@
         android:theme="@android:style/Theme.Holo"
         android:largeHeap="true">
         <activity
-            android:name=".WiFiDirectActivity"
+            android:name=".activities.MainActivity"
             android:label="@string/app_name" android:launchMode="singleTask">
             <intent-filter>
                 <action
@@ -30,7 +32,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ImageDisplaying"
+            android:name=".activities.ImageDisplaying"
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:windowActionBar="false"
@@ -42,7 +44,7 @@
         </activity>
 
         <!-- Used for transferring files  after a successful connection -->
-        <service android:enabled="true" android:name=".FileTransferService" />
+        <service android:enabled="true" android:name=".services.WiFiTransferService" />
 
     </application>
 </manifest>
