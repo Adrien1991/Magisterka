@@ -10,15 +10,17 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+
 
 import com.example.android.wifidirect.activities.MainActivity;
 import com.example.android.wifidirect.activities.ImageDisplaying;
 import com.example.android.wifidirect.fragments.GroupOperationsFragment;
 
-import java.io.DataInputStream;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -36,11 +38,12 @@ public class WiFiTransferService extends IntentService {
 
     private static final int SOCKET_TIMEOUT = 5000;
     public static final String ACTION_SEND_FILE = "com.example.android.wifidirect.SEND_FILE";
-    public static final String EXTRAS_FILE_PATH = "file_url";
+    public static final String EXTRAS_FILE_PATH = "url";
     public static final String EXTRAS_ADDRESS = "go_host";
     public static final String EXTRAS_PORT = "go_port";
     public static String ip;
     private int i;
+    public static String fileUri = "destination_uri";
 
     public WiFiTransferService(String name) {
         super(name);
@@ -63,9 +66,10 @@ public class WiFiTransferService extends IntentService {
         for (i = 0; i <= (ilosc - 1); i++) {
             if (intent.getAction().equals(ACTION_SEND_FILE)) {
 
-                String fileUri = intent.getExtras().getString(EXTRAS_FILE_PATH);
+                fileUri = intent.getExtras().getString(EXTRAS_FILE_PATH);
                 String host = intent.getExtras().getString(EXTRAS_ADDRESS);
                 Socket socket = new Socket();
+
 
 
                 ip = "192.168.49.1";
@@ -97,6 +101,7 @@ public class WiFiTransferService extends IntentService {
                         Log.d(MainActivity.TAG, e.toString());
                     }
                     WiFiTransferService.FileServerAsyncTask.copyFile(is, stream);
+
                     Log.d(MainActivity.TAG, "Zapisano dane");
                 } catch (IOException e) {
                     Log.e(MainActivity.TAG, e.getMessage());
@@ -122,48 +127,14 @@ public class WiFiTransferService extends IntentService {
     public static class FileServerAsyncTask extends AsyncTask<Void, Void, String> {
 
         public static Context context;
-        private TextView statusText;
+        public static TextView statusText;
         public static Intent intentP = null;
-        public static int wartosc;
+        private File f;
 
 
         public FileServerAsyncTask(Context context, View statusText) {
             this.context = context;
             this.statusText = (TextView) statusText;
-        }
-
-
-        //Odbieranie danych
-        @Override
-        protected String doInBackground(Void... params) {
-            ServerSocket serverSocket = null;
-            Socket client = null;
-            DataInputStream inputStreamString = null;
-            try {
-                serverSocket = new ServerSocket(8988);
-                Log.d(MainActivity.TAG, "Serwer: Połęczenie otwarto");
-                client = serverSocket.accept();
-                Log.d(MainActivity.TAG, "Serwer: Połączenie nawiązano");
-                final File f = new File(Environment.getExternalStorageDirectory() + "/"
-                        + context.getPackageName() + "/wifip2pshared-" + System.currentTimeMillis()
-                        + ".jpg");
-
-                File dirs = new File(f.getParent());
-                if (!dirs.exists())
-                    dirs.mkdirs();
-                f.createNewFile();
-
-                Log.d(MainActivity.TAG, "Serwer: Kopiowanie plików " + f.toString());
-                InputStream inputStream = client.getInputStream();
-                copyFile(inputStream, new FileOutputStream(f));
-                serverSocket.close();
-                return f.getAbsolutePath();
-            } catch (IOException e) {
-                Log.e(MainActivity.TAG, e.getMessage());
-            }
-
-
-            return null;
         }
 
         /*
@@ -175,9 +146,29 @@ public class WiFiTransferService extends IntentService {
                 statusText.setText("Plik skopiowany - " + result);
                 Activity activity = (Activity) GroupOperationsFragment.mContentView.getContext();
                 intentP = new Intent(activity.getBaseContext(), ImageDisplaying.class);
-                intentP.setDataAndType(Uri.parse("file://" + result), "image/*");
+                intentP.setData(Uri.parse("file://" + result));
                 intentP.putExtra(result, Uri.parse("file://" + result));
-                context.startActivity(intentP);
+                File file = new File(Environment.getExternalStorageDirectory() + "/"
+                        + context.getPackageName() + "/wifip2pshared-" + "temp");
+                long weight = file.length();
+                if (weight > 256){
+                    file = new File(Environment.getExternalStorageDirectory() + "/"
+                            + context.getPackageName() + "/wifip2pshared-" + "temp");
+                    result = (Environment.getExternalStorageDirectory() + "/"
+                            + context.getPackageName() + "/wifip2pshared-" + System.currentTimeMillis() + ".jpg");
+                    file.renameTo(new File(result));
+                    intentP.setData(Uri.parse("file://" + result));
+                    intentP.putExtra(result, Uri.parse("file://" + result));
+                    context.startActivity(intentP);
+                }else{
+                    file = new File(Environment.getExternalStorageDirectory() + "/"
+                            + context.getPackageName() + "/wifip2pshared-" + "temp");
+                    result = (Environment.getExternalStorageDirectory() + "/"
+                            + context.getPackageName() + "/variables" + ".xml");
+                    file.renameTo(new File(result));
+                    intentP.setData(Uri.parse("file://" + result));
+                    intentP.putExtra(result, Uri.parse("file://" + result));
+                }
             }
 
         }
@@ -185,7 +176,45 @@ public class WiFiTransferService extends IntentService {
 
         @Override
         protected void onPreExecute() {
+
             statusText.setText("Otwieranie połączenia z serwerem");
+        }
+
+
+
+        //Odbieranie danych
+        @Override
+        protected String doInBackground(Void... params) {
+            ServerSocket serverSocket = null;
+            Socket client = null;
+            try {
+                serverSocket = new ServerSocket(8988);
+                Log.d(MainActivity.TAG, "Serwer: Połączenie otwarto");
+                client = serverSocket.accept();
+                Log.d(MainActivity.TAG, "Serwer: Połączenie nawiązano");
+                InputStream inputStream = client.getInputStream();
+
+                f = new File(Environment.getExternalStorageDirectory() + "/"
+                        + context.getPackageName() + "/wifip2pshared-" + "temp"
+                        );
+
+                File dirs = new File(f.getParent());
+                if (!dirs.exists())
+                    dirs.mkdirs();
+                f.createNewFile();
+
+                Log.d(MainActivity.TAG, "Serwer: Kopiowanie plików " + f.toString());
+
+                FileOutputStream outputStream = new FileOutputStream(f);
+                copyFile(inputStream, outputStream);
+                serverSocket.close();
+                return f.getAbsolutePath();
+            } catch (IOException e) {
+                Log.e(MainActivity.TAG, e.getMessage());
+            }
+
+
+            return null;
         }
 
         //Metoda do kopiowania pliku
@@ -206,5 +235,10 @@ public class WiFiTransferService extends IntentService {
             return true;
         }
 
+
+
     }
+
+
+
 }

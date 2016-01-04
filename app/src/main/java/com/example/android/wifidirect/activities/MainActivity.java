@@ -28,8 +28,10 @@ import android.widget.Toast;
 import com.example.android.wifidirect.interfaces.DeviceActionListener;
 import com.example.android.wifidirect.fragments.DeviceListFragment;
 import com.example.android.wifidirect.R;
+import com.example.android.wifidirect.services.DataUpdateReceiver;
 import com.example.android.wifidirect.services.WiFiDirectBroadcastReceiver;
 import com.example.android.wifidirect.fragments.GroupOperationsFragment;
+import com.example.android.wifidirect.services.WiFiTransferService;
 
 /**
  * An activity that uses WiFi Direct APIs to discover and connect with available
@@ -46,6 +48,8 @@ public class MainActivity extends Activity implements ChannelListener, DeviceAct
     private WifiP2pManager manager;
     private boolean isWifiP2pEnabled = false;
     private boolean retryChannel = false;
+
+    private DataUpdateReceiver dataUpdateReceiver;
 
     private final IntentFilter intentFilter = new IntentFilter();
     private Channel channel;
@@ -65,6 +69,8 @@ public class MainActivity extends Activity implements ChannelListener, DeviceAct
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
+        intentFilter.addAction(WiFiTransferService.ACTION_SEND_FILE);
+
 
         manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         channel = manager.initialize(this, getMainLooper(), null);
@@ -76,6 +82,7 @@ public class MainActivity extends Activity implements ChannelListener, DeviceAct
         display.getSize(size);
         screenWidth = size.x;
         screenHeight = size.y;
+
     }
 
     /** Rejestracja BroadcastReceivera
@@ -85,12 +92,20 @@ public class MainActivity extends Activity implements ChannelListener, DeviceAct
         super.onResume();
         receiver = new WiFiDirectBroadcastReceiver(manager, channel, this);
         registerReceiver(receiver, intentFilter);
+
+        if (dataUpdateReceiver == null) dataUpdateReceiver = new DataUpdateReceiver();
+        registerReceiver(dataUpdateReceiver, intentFilter);
+
+        if (WiFiTransferService.FileServerAsyncTask.intentP != null) unregisterReceiver(receiver);
+
     }
 
     @Override
     public void onPause() {
         super.onPause();
         unregisterReceiver(receiver);
+
+        if (dataUpdateReceiver != null) unregisterReceiver(dataUpdateReceiver);
     }
 
     /**

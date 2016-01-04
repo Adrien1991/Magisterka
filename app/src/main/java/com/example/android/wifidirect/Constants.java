@@ -1,12 +1,25 @@
 package com.example.android.wifidirect;
 
 import android.app.ProgressDialog;
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
 import android.net.wifi.p2p.WifiP2pDevice;
+import android.provider.BaseColumns;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.Switch;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,3 +50,5 @@ public class Constants {
 
 
 }
+
+

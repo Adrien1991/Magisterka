@@ -57,6 +57,8 @@ public class GroupOperationsFragment extends Fragment implements ConnectionInfoL
     public static boolean activated = false;
     public static WifiP2pConfig config;
     public static Intent intentGlobal;
+    private Intent serviceIntent;
+    private String typ;
 
 
     @Override
@@ -126,7 +128,7 @@ public class GroupOperationsFragment extends Fragment implements ConnectionInfoL
     }
 
 
-    // Użytkownik wybrał obraz, przesyłanie go za pomocą WiFiTransferService do urządzeń
+    // Użytkownik wybrał plik, przesyłanie go za pomocą WiFiTransferService do urządzeń
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -134,13 +136,20 @@ public class GroupOperationsFragment extends Fragment implements ConnectionInfoL
         TextView statusText = (TextView) mContentView.findViewById(R.id.status_text);
         statusText.setText("Wysyłanie: " + uri);
         Log.d(MainActivity.TAG, "Intent----------- " + uri);
-        Intent serviceIntent = new Intent(getActivity(), WiFiTransferService.class);
+        serviceIntent = new Intent(getActivity(), WiFiTransferService.class);
         serviceIntent.setAction(WiFiTransferService.ACTION_SEND_FILE);
         serviceIntent.putExtra(WiFiTransferService.EXTRAS_FILE_PATH, uri.toString());
         serviceIntent.putExtra(WiFiTransferService.EXTRAS_ADDRESS,
                 info.groupOwnerAddress.getHostAddress());
         serviceIntent.putExtra(WiFiTransferService.EXTRAS_PORT, 8988);
+        if (uri.toString().contains("xml") ){
+            serviceIntent.setType("text/*");
+        }else {
+            serviceIntent.setType("image/*");
+        }
         getActivity().startService(serviceIntent);
+
+
 
         //Odpalenie ImageDisplaying.class zamiast domyślnej przeglądarki obrazów
         Activity activity = (Activity) mContentView.getContext();
@@ -165,6 +174,10 @@ public class GroupOperationsFragment extends Fragment implements ConnectionInfoL
 
         view = (TextView) mContentView.findViewById(R.id.device_info);
         view.setText("IP administratora grupy - " + info.groupOwnerAddress.getHostAddress());
+
+
+
+
 
         //Jeżeli ustalimy amdinistratora grupy, dostanie on władzę nad wysyłaniem plików. Jeżeli tego nie zrobiliśmy, urządzenia same wynegocjują kto jest administartorem i temu przyznają prawa.
         if (info.groupFormed && info.isGroupOwner) {

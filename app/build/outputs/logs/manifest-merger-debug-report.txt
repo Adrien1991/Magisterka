@@ -1,6 +1,6 @@
 -- Merging decision tree log ---
 manifest
-ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:2:1-50:12
+ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:2:1-51:12
 	package
 		ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:2:70-110
 		INJECTED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml
@@ -58,57 +58,61 @@ uses-permission#android.permission.DOWNLOAD_WITHOUT_NOTIFICATION
 ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:14:5-88
 	android:name
 		ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:14:22-85
+uses-permission#android.permission.MANAGE_DOCUMENTS
+ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:15:5-74
+	android:name
+		ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:15:22-72
 uses-feature#android.hardware.wifi.direct
-ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:17:5-88
+ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:18:5-88
 	android:required
-		ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:17:63-86
+		ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:18:63-86
 	android:name
-		ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:17:19-62
+		ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:18:19-62
 application
-ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:19:5-49:19
+ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:20:5-50:19
 	android:label
-		ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:21:9-41
+		ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:22:9-41
 	android:icon
-		ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:20:9-45
+		ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:21:9-45
 	android:largeHeap
-		ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:23:9-33
+		ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:24:9-33
 	android:theme
-		ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:22:9-50
+		ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:23:9-50
 activity#com.example.android.wifidirect.activities.MainActivity
-ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:24:9-33:20
+ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:25:9-34:20
 	android:label
-		ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:26:13-45
+		ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:27:13-45
 	android:launchMode
-		ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:26:46-77
+		ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:27:46-77
 	android:name
-		ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:25:13-52
+		ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:26:13-52
 intent-filter#android.intent.action.MAIN+android.intent.category.LAUNCHER
-ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:27:13-32:29
+ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:28:13-33:29
 action#android.intent.action.MAIN
-ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:28:17-29:65
+ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:29:17-30:65
 	android:name
-		ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:29:21-62
+		ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:30:21-62
 category#android.intent.category.LAUNCHER
-ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:30:17-31:71
+ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:31:17-32:71
 	android:name
-		ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:31:21-68
+		ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:32:21-68
 activity#com.example.android.wifidirect.activities.ImageDisplaying
-ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:34:9-44:20
+ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:35:9-45:20
 	android:label
-		ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:36:13-45
+		ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:37:13-45
 	android:launchMode
-		ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:37:13-44
-	android:windowActionBar
 		ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:38:13-44
+	android:windowActionBar
+		ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:39:13-44
 	android:theme
-		ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:39:13-71
+		ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:40:13-71
 	android:name
-		ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:35:13-55
+		ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:36:13-55
 intent-filter#android.intent.action.MAIN
-ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:40:13-43:33
+ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:41:13-44:33
 service#com.example.android.wifidirect.services.WiFiTransferService
-ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:47:9-88
+ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:48:9-88
 	android:enabled
-		ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:47:18-40
+		ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:48:18-40
 	android:name
-		ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:47:41-85
+		ADDED from C:\Users\Adrian\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:48:41-85
