@@ -88,4 +88,4 @@
         android:layout_height="match_parent"
         android:text="@string/empty_message" />
 </LinearLayout>
-<!-- From: file:/C:/Users/Adrian/AndroidStudioProjects/WiFiDirectDemo/app/src/main/res/layout/device_list.xml -->
+<!-- From: file:/C:/Users/User/AndroidStudioProjects/WiFiDirectDemo/app/src/main/res/layout/device_list.xml -->

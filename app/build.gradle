@@ -5,8 +5,8 @@ android {
 
     defaultConfig {
         applicationId "com.example.android.wifidirect"
-        minSdkVersion 14
-        targetSdkVersion 14
+        minSdkVersion 17
+        targetSdkVersion 19
     }
 
     buildTypes {

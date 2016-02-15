@@ -12,10 +12,14 @@ import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
 import android.util.Log;
 
+import com.example.android.wifidirect.activities.ImageDisplaying;
 import com.example.android.wifidirect.fragments.DeviceListFragment;
 import com.example.android.wifidirect.activities.MainActivity;
 import com.example.android.wifidirect.R;
 import com.example.android.wifidirect.fragments.GroupOperationsFragment;
+
+import java.lang.reflect.Array;
+import java.util.Collection;
 
 /**
  * BroadcastReceiver rozpoznaje wydarzenia z WIFiDirect
@@ -26,15 +30,15 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
     private Channel channel;
     private MainActivity activity;
     public static int liczbaPeerow;
+    public static Collection<WifiP2pDevice> peersArray;
 
-
-    public WiFiDirectBroadcastReceiver(WifiP2pManager manager, Channel channel,
-            MainActivity activity) {
+    public WiFiDirectBroadcastReceiver(WifiP2pManager manager, Channel channel, MainActivity activity) {
         super();
         this.manager = manager;
         this.channel = channel;
         this.activity = activity;
     }
+
 
 
     @Override
@@ -47,6 +51,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
             if (state == WifiP2pManager.WIFI_P2P_STATE_ENABLED) {
 
                 activity.setIsWifiP2pEnabled(true);
+
             } else {
                 activity.setIsWifiP2pEnabled(false);
                 activity.resetData();
@@ -88,11 +93,16 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                     WifiP2pManager.EXTRA_WIFI_P2P_DEVICE));
 
         }
+
+
+
+
         manager.requestGroupInfo(channel, new WifiP2pManager.GroupInfoListener() {
             @Override
             public void onGroupInfoAvailable(WifiP2pGroup group) {
                     if(group != null) {
                     liczbaPeerow = group.getClientList().size();
+
                 }
             }
         });

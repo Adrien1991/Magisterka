@@ -78,7 +78,7 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
         return Constants.mContentView;
     }
 
-    //Gettr, który zwraca urządzenie, nie jego profil, a status w sieci WiFiDirect.
+    //Getter, który zwraca urządzenie, nie jego profil, a status w sieci WiFiDirect.
     public  WifiP2pDevice getDevice() {
         return Constants.device;
 

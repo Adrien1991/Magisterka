@@ -15,23 +15,30 @@ import android.net.wifi.p2p.WifiP2pManager.ActionListener;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.net.wifi.p2p.WifiP2pManager.ChannelListener;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.Settings;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.android.wifidirect.interfaces.DeviceActionListener;
 import com.example.android.wifidirect.fragments.DeviceListFragment;
 import com.example.android.wifidirect.R;
-import com.example.android.wifidirect.services.DataUpdateReceiver;
 import com.example.android.wifidirect.services.WiFiDirectBroadcastReceiver;
 import com.example.android.wifidirect.fragments.GroupOperationsFragment;
 import com.example.android.wifidirect.services.WiFiTransferService;
+
+import java.io.File;
+import java.util.Collection;
 
 /**
  * An activity that uses WiFi Direct APIs to discover and connect with available
@@ -45,15 +52,18 @@ public class MainActivity extends Activity implements ChannelListener, DeviceAct
     public static final String TAG = "Screen sharing";
     public static int screenWidth;
     public static int screenHeight;
-    private WifiP2pManager manager;
+    protected WifiP2pManager manager;
     private boolean isWifiP2pEnabled = false;
     private boolean retryChannel = false;
+    public final Activity activity = this;
+    public static MainActivity activityMain;
 
-    private DataUpdateReceiver dataUpdateReceiver;
 
-    private final IntentFilter intentFilter = new IntentFilter();
-    private Channel channel;
-    private BroadcastReceiver receiver = null;
+    protected final IntentFilter intentFilter = new IntentFilter();
+    protected Channel channel;
+    private  BroadcastReceiver receiver = null;
+    public static double trueDpi;
+    public static float scaleFactor;
 
     public void setIsWifiP2pEnabled(boolean isWifiP2pEnabled) {
         this.isWifiP2pEnabled = isWifiP2pEnabled;
@@ -64,6 +74,7 @@ public class MainActivity extends Activity implements ChannelListener, DeviceAct
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
+        activityMain = this;
 
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
@@ -83,6 +94,20 @@ public class MainActivity extends Activity implements ChannelListener, DeviceAct
         screenWidth = size.x;
         screenHeight = size.y;
 
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+        float widthDpi = metrics.xdpi;
+        float heightDpi = metrics.ydpi;
+
+        scaleFactor = metrics.density;
+
+
+
+        trueDpi = (widthDpi+heightDpi)/2;
+
+
+
     }
 
     /** Rejestracja BroadcastReceivera
@@ -93,10 +118,12 @@ public class MainActivity extends Activity implements ChannelListener, DeviceAct
         receiver = new WiFiDirectBroadcastReceiver(manager, channel, this);
         registerReceiver(receiver, intentFilter);
 
-        if (dataUpdateReceiver == null) dataUpdateReceiver = new DataUpdateReceiver();
-        registerReceiver(dataUpdateReceiver, intentFilter);
-
-        if (WiFiTransferService.FileServerAsyncTask.intentP != null) unregisterReceiver(receiver);
+        File varChek = new File(Environment.getExternalStorageDirectory() + "/"
+                + this.getPackageName() + "/variables" + ".xml");
+        if (varChek.exists()) varChek.delete();
+        varChek = new File(Environment.getExternalStorageDirectory() + "/"
+                + this.getPackageName() + "/variables-received" + ".xml");
+        if (varChek.exists()) varChek.delete();
 
     }
 
@@ -105,8 +132,9 @@ public class MainActivity extends Activity implements ChannelListener, DeviceAct
         super.onPause();
         unregisterReceiver(receiver);
 
-        if (dataUpdateReceiver != null) unregisterReceiver(dataUpdateReceiver);
     }
+
+
 
     /**
      * Przy zmianie stanu wyrzuca wszystkie peery
@@ -215,6 +243,7 @@ public class MainActivity extends Activity implements ChannelListener, DeviceAct
             @Override
             public void onSuccess() {
 
+
                 fragment.getView().setVisibility(View.GONE);
 
             }
@@ -270,6 +299,7 @@ public class MainActivity extends Activity implements ChannelListener, DeviceAct
         }
 
     }
+
 
 
 }

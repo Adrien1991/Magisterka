@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- From: file:/C:/Users/Adrian/AndroidStudioProjects/WiFiDirectDemo/app/src/main/res/values/colors.xml -->
+    <!-- From: file:/C:/Users/User/AndroidStudioProjects/WiFiDirectDemo/app/src/main/res/values/colors.xml -->
     <eat-comment/>
     <color name="layout_border_color">#FF111111</color>
     <color name="status_bar_color">#FF000000</color>
-    <!-- From: file:/C:/Users/Adrian/AndroidStudioProjects/WiFiDirectDemo/app/src/main/res/values/dimens.xml -->
+    <!-- From: file:/C:/Users/User/AndroidStudioProjects/WiFiDirectDemo/app/src/main/res/values/dimens.xml -->
     <eat-comment/>
     <dimen name="phone_list_height">200dp</dimen>
     <dimen name="tablet_list_width">300dp</dimen>
-    <!-- From: file:/C:/Users/Adrian/AndroidStudioProjects/WiFiDirectDemo/app/src/main/res/values/strings.xml -->
+    <!-- From: file:/C:/Users/User/AndroidStudioProjects/WiFiDirectDemo/app/src/main/res/values/strings.xml -->
     <eat-comment/>
     <string name="app_name">Screen Sharing</string>
     <string name="client_text">To urządzenie jest Klientem. Może tylko odbierać dane od hosta grupy.</string>
