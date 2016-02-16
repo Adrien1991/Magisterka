@@ -2,6 +2,7 @@ package com.example.android.wifidirect.activities;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -27,6 +28,8 @@ import com.example.android.wifidirect.R;
 import com.example.android.wifidirect.services.WiFiDirectBroadcastReceiver;
 import com.example.android.wifidirect.services.WiFiTransferService;
 import com.example.android.wifidirect.fragments.GroupOperationsFragment;
+
+import org.apache.commons.io.FilenameUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -38,6 +41,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -78,7 +82,7 @@ public class ImageDisplaying extends Activity implements View.OnTouchListener {
     private double densityMaster;
     private double densityStandarisation;
     private double pictureStandarisation;
-    private String whereIm;
+    private String whereIm = "";
     private int globalPosition;
 
 
@@ -182,7 +186,7 @@ public class ImageDisplaying extends Activity implements View.OnTouchListener {
                         item = items.item(0);
                         densityMaster = Double.parseDouble(item.getFirstChild().getNodeValue());
 
-                        items = root.getElementsByTagName("density");
+                        items = root.getElementsByTagName("deviceTag");
                         item = items.item(0);
                         whereIm = item.getFirstChild().getNodeValue();
 
@@ -232,24 +236,28 @@ public class ImageDisplaying extends Activity implements View.OnTouchListener {
         //Drobna rekompensata za utratę pikseli przy zaokrąglaniu
         pictureStandarisation = loadedImage.getWidth() * 0.00625;
 
-//        // Wyliczanie nowych marginesów dla obrazu na urządzeniu biorcy, po prawej
-//        lewyNowy = (int) ((lewyNowy-widthScreenMaster) *densityStandarisation);
-//        prawyNowy = (int) ((prawyNowy-widthScreenMaster) *densityStandarisation);
-//        gornyNowy = (int) ( gornyNowy* dpiStandarisation);
-//        dolnyNowy = (int) ( dolnyNowy* dpiStandarisation);
-
-        // Wyliczanie nowych marginesów dla obrazu na urządzeniu biorcy, po lewej
-        lewyNowy = (int) ((lewyNowy-widthScreenMaster) *densityStandarisation);
-        prawyNowy = (int) ((prawyNowy-widthScreenMaster) *densityStandarisation);
-        gornyNowy = (int) ( gornyNowy* dpiStandarisation);
-        dolnyNowy = (int) ( dolnyNowy* dpiStandarisation);
+        if (whereIm.length() > 2) {
+            if (Objects.equals(Character.toString(whereIm.charAt((globalPosition * 2) + 1)), "R")) {
+                // Wyliczanie nowych marginesów dla obrazu na urządzeniu biorcy, po prawej
+                lewyNowy = (int) ((lewyNowy - widthScreenMaster) * densityStandarisation);
+                prawyNowy = (int) ((prawyNowy - widthScreenMaster) * densityStandarisation);
+                gornyNowy = (int) (gornyNowy * densityStandarisation);
+                dolnyNowy = (int) (dolnyNowy * densityStandarisation);
+            } else if (Objects.equals(Character.toString(whereIm.charAt((globalPosition * 2) + 1)), "L")) {
+                // Wyliczanie nowych marginesów dla obrazu na urządzeniu biorcy, po lewej
+                lewyNowy = (int) ((lewyNowy * densityStandarisation) + MainActivity.screenWidth);
+                prawyNowy = (int) ((prawyNowy * densityStandarisation) + MainActivity.screenWidth);
+                gornyNowy = (int) (gornyNowy * dpiStandarisation);
+                dolnyNowy = (int) (dolnyNowy * dpiStandarisation);
+            }
+        }
 
 
         if (varChek.exists()){
             Constants.jpgView.setVisibility(View.VISIBLE);
 
-            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams((int) (loadedImage.getWidth()* dpiStandarisation), (int) (loadedImage.getHeight()* dpiStandarisation));
-            lp.setMargins(-lewyNowy, gornyNowy, -prawyNowy, dolnyNowy);
+            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams((int) (loadedImage.getWidth()* dpiStandarisation), (int) (loadedImage.getHeight() * dpiStandarisation));
+            lp.setMargins(lewyNowy, gornyNowy, prawyNowy, dolnyNowy);
             Constants.jpgView.setLayoutParams(lp);
             Constants._root.invalidate();
 
@@ -352,6 +360,16 @@ public class ImageDisplaying extends Activity implements View.OnTouchListener {
                         transformer.transform(domSource, streamResult);
 
                         System.out.println("Stworzono XML");
+
+                        // insert system media db
+
+                        ContentValues values = new ContentValues();
+                        values.put(MediaStore.Files.FileColumns.TITLE,
+                                FilenameUtils.getBaseName(xmlFilePath));
+                        values.put(MediaStore.Files.FileColumns.MIME_TYPE, "text/*");
+                        values.put("_data", xmlFilePath);
+                        getContentResolver().insert(
+                                MediaStore.Files.getContentUri("external"), values);
 
 
 

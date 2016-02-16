@@ -180,6 +180,8 @@ public class GroupOperationsFragment extends Fragment implements ConnectionInfoL
 
                         config = new WifiP2pConfig();
 
+                        peersTag = peersTag + String.valueOf(peersTag.length() / 2) + upperButton.getText().toString();
+
                         //Switch do ustalania i zerowania przywileju administratora
                         if (Constants.groupOwnerSwitch.isChecked() == true) {
                             config.groupOwnerIntent = 15;
@@ -200,7 +202,7 @@ public class GroupOperationsFragment extends Fragment implements ConnectionInfoL
                         );
                         ((DeviceActionListener) getActivity()).connect(config);
 
-                        peersTag = peersTag + String.valueOf(peersTag.length() / 2) + upperButton.getText().toString();
+
 
                         Intent intent = new Intent(getActivity(), MainActivity.class);
                         startActivity(intent);
@@ -214,6 +216,8 @@ public class GroupOperationsFragment extends Fragment implements ConnectionInfoL
 
                         config = new WifiP2pConfig();
 
+                        peersTag = peersTag + String.valueOf(peersTag.length()/2) + lowerButton.getText().toString();
+
                         //Switch do ustalania i zerowania przywileju administratora
                         if (Constants.groupOwnerSwitch.isChecked() == true) {
                             config.groupOwnerIntent = 15;
@@ -234,7 +238,7 @@ public class GroupOperationsFragment extends Fragment implements ConnectionInfoL
                         );
                         ((DeviceActionListener) getActivity()).connect(config);
 
-                        peersTag = peersTag + String.valueOf(peersTag.length()/2) + lowerButton.getText().toString();
+
 
                         Intent intent = new Intent (getActivity(), MainActivity.class);
                         startActivity(intent);
@@ -248,6 +252,8 @@ public class GroupOperationsFragment extends Fragment implements ConnectionInfoL
 
                         config = new WifiP2pConfig();
 
+                        peersTag = peersTag + String.valueOf(peersTag.length()/2) + rightButton.getText().toString();
+
                         //Switch do ustalania i zerowania przywileju administratora
                         if (Constants.groupOwnerSwitch.isChecked() == true) {
                             config.groupOwnerIntent = 15;
@@ -267,8 +273,6 @@ public class GroupOperationsFragment extends Fragment implements ConnectionInfoL
                                 "Podłączanie do :" + device.deviceAddress, true, true
                         );
                         ((DeviceActionListener) getActivity()).connect(config);
-
-                        peersTag = peersTag + String.valueOf(peersTag.length()/2) + rightButton.getText().toString();
 
                         Intent intent = new Intent (getActivity(), MainActivity.class);
                         startActivity(intent);
@@ -282,6 +286,8 @@ public class GroupOperationsFragment extends Fragment implements ConnectionInfoL
 
                         config = new WifiP2pConfig();
 
+                        peersTag = peersTag + String.valueOf(peersTag.length()/2) + leftButton.getText().toString();
+
                         //Switch do ustalania i zerowania przywileju administratora
                         if (Constants.groupOwnerSwitch.isChecked() == true) {
                             config.groupOwnerIntent = 15;
@@ -301,8 +307,6 @@ public class GroupOperationsFragment extends Fragment implements ConnectionInfoL
                                 "Podłączanie do :" + device.deviceAddress, true, true
                         );
                         ((DeviceActionListener) getActivity()).connect(config);
-
-                        peersTag = peersTag + String.valueOf(peersTag.length()/2) + leftButton.getText().toString();
 
                         Intent intent = new Intent (getActivity(), MainActivity.class);
                         startActivity(intent);
@@ -323,6 +327,7 @@ public class GroupOperationsFragment extends Fragment implements ConnectionInfoL
                     @Override
                     public void onClick(View v) {
                         Constants.groupOwnerSwitch.setChecked(false);
+                        peersTag = "0M";
                         ((DeviceActionListener) getActivity()).disconnect();
                     }
                 });
