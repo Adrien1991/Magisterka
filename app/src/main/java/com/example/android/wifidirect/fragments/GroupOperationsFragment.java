@@ -22,6 +22,7 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -56,23 +57,25 @@ import com.example.android.wifidirect.activities.MainActivity;
 import com.example.android.wifidirect.services.WiFiDirectBroadcastReceiver;
 import com.example.android.wifidirect.services.WiFiTransferService;
 
+import org.apache.commons.io.FilenameUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.SocketException;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 /**
  * Fragment do zarządzania urządzeniem i interakcji z innymi urządzeniami, w tym transfer danych i nazwiązywanie nowego połączenia
@@ -97,13 +100,16 @@ public class GroupOperationsFragment extends Fragment implements ConnectionInfoL
     private Button rightButton;
     private Button lowerButton;
     public static String peersTag = "";
-
+    private int clusterScreenWidth = 0;
+    private int clusterScreenHeight = 0;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
         if (peersTag.length() == 0)peersTag ="0M";
+        if (clusterScreenHeight == 0) clusterScreenHeight = MainActivity.screenHeight;
+        if (clusterScreenWidth == 0) clusterScreenWidth = MainActivity.screenWidth;
 
     }
 
@@ -190,6 +196,14 @@ public class GroupOperationsFragment extends Fragment implements ConnectionInfoL
                         }
 
                         config.deviceAddress = device.deviceAddress;
+                        String name = device.deviceName;
+                        String[] result = name.split("\\|");
+                        int widthToAdd = Integer.valueOf(result[result.length - 2]);
+                        int heightToAdd = Integer.valueOf(result[result.length - 1]);
+                        clusterScreenHeight = clusterScreenHeight + heightToAdd;
+                        if (clusterScreenWidth < widthToAdd){
+                            clusterScreenWidth = widthToAdd;
+                        }
                         config.wps.setup = WpsInfo.PBC;
 
                         activated = true;
@@ -226,6 +240,14 @@ public class GroupOperationsFragment extends Fragment implements ConnectionInfoL
                         }
 
                         config.deviceAddress = device.deviceAddress;
+                        String name = device.deviceName;
+                        String[] result = name.split("\\|");
+                        int widthToAdd = Integer.valueOf(result[result.length - 2]);
+                        int heightToAdd = Integer.valueOf(result[result.length - 1]);
+                        clusterScreenWidth = clusterScreenWidth + widthToAdd;
+                        if (clusterScreenHeight < heightToAdd){
+                            clusterScreenHeight = heightToAdd;
+                        }
                         config.wps.setup = WpsInfo.PBC;
 
                         activated = true;
@@ -262,6 +284,15 @@ public class GroupOperationsFragment extends Fragment implements ConnectionInfoL
                         }
 
                         config.deviceAddress = device.deviceAddress;
+                        String name = device.deviceName;
+                        String[] result = name.split("\\|");
+                        int widthToAdd = Integer.valueOf(result[result.length - 2]);
+                        int heightToAdd = Integer.valueOf(result[result.length - 1]);
+
+                        clusterScreenWidth = clusterScreenWidth + widthToAdd;
+                        if (clusterScreenHeight < heightToAdd){
+                            clusterScreenHeight = heightToAdd;
+                        }
                         config.wps.setup = WpsInfo.PBC;
 
                         activated = true;
@@ -296,6 +327,14 @@ public class GroupOperationsFragment extends Fragment implements ConnectionInfoL
                         }
 
                         config.deviceAddress = device.deviceAddress;
+                        String name = device.deviceName;
+                        String[] result = name.split("\\|");
+                        int widthToAdd = Integer.valueOf(result[result.length - 2]);
+                        int heightToAdd = Integer.valueOf(result[result.length - 1]);
+                        clusterScreenHeight = clusterScreenHeight + heightToAdd;
+                        if (clusterScreenWidth < widthToAdd){
+                            clusterScreenWidth = widthToAdd;
+                        }
                         config.wps.setup = WpsInfo.PBC;
 
                         activated = true;
@@ -445,6 +484,8 @@ public class GroupOperationsFragment extends Fragment implements ConnectionInfoL
         this.info = info;
         this.getView().setVisibility(View.VISIBLE);
 
+        String xmlFilePath = Environment.getExternalStorageDirectory() + "/" + getActivity().getPackageName()+ "/" + "screenSize" + ".xml";
+
         TextView view = (TextView) mContentView.findViewById(R.id.group_owner);
         view.setText(getResources().getString(R.string.group_owner_text)
                 + ((info.isGroupOwner == true) ? getResources().getString(R.string.yes)
@@ -473,7 +514,6 @@ public class GroupOperationsFragment extends Fragment implements ConnectionInfoL
                     .getString(R.string.client_text));
             // Ukrycie przycisku połącz
             mContentView.findViewById(R.id.btn_connect).setVisibility(View.GONE);
-
 
         }
 

@@ -2,7 +2,9 @@
 
 package com.example.android.wifidirect.activities;
 
+import android.animation.AnimatorSet;
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +16,7 @@ import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.ActionListener;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.net.wifi.p2p.WifiP2pManager.ChannelListener;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.Settings;
@@ -38,6 +41,9 @@ import com.example.android.wifidirect.fragments.GroupOperationsFragment;
 import com.example.android.wifidirect.services.WiFiTransferService;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -52,7 +58,7 @@ public class MainActivity extends Activity implements ChannelListener, DeviceAct
     public static final String TAG = "Screen sharing";
     public static int screenWidth;
     public static int screenHeight;
-    protected WifiP2pManager manager;
+    protected static WifiP2pManager manager;
     private boolean isWifiP2pEnabled = false;
     private boolean retryChannel = false;
     public final Activity activity = this;
@@ -60,7 +66,7 @@ public class MainActivity extends Activity implements ChannelListener, DeviceAct
 
 
     protected final IntentFilter intentFilter = new IntentFilter();
-    protected Channel channel;
+    protected static Channel channel;
     private  BroadcastReceiver receiver = null;
     public static double trueDpi;
     public static float scaleFactor;
@@ -101,14 +107,13 @@ public class MainActivity extends Activity implements ChannelListener, DeviceAct
         float heightDpi = metrics.ydpi;
 
         scaleFactor = metrics.density;
-
-
-
         trueDpi = (widthDpi+heightDpi)/2;
 
 
+        setDeviceName(android.os.Build.MODEL + "|" + String.valueOf(screenWidth) + "|" + String.valueOf(screenHeight));
 
     }
+
 
     /** Rejestracja BroadcastReceivera
      */
@@ -117,6 +122,9 @@ public class MainActivity extends Activity implements ChannelListener, DeviceAct
         super.onResume();
         receiver = new WiFiDirectBroadcastReceiver(manager, channel, this);
         registerReceiver(receiver, intentFilter);
+
+
+
 
         File varChek = new File(Environment.getExternalStorageDirectory() + "/"
                 + this.getPackageName() + "/variables" + ".xml");
@@ -133,7 +141,6 @@ public class MainActivity extends Activity implements ChannelListener, DeviceAct
         unregisterReceiver(receiver);
 
     }
-
 
 
     /**
@@ -296,6 +303,46 @@ public class MainActivity extends Activity implements ChannelListener, DeviceAct
                     }
                 });
             }
+        }
+
+    }
+
+    public static void setDeviceName(String devName) {
+        try {
+            Class[] paramTypes = new Class[3];
+            paramTypes[0] = Channel.class;
+            paramTypes[1] = String.class;
+            paramTypes[2] = ActionListener.class;
+            Method setDeviceName = manager.getClass().getMethod(
+                    "setDeviceName", paramTypes);
+            setDeviceName.setAccessible(true);
+
+            Object arglist[] = new Object[3];
+            arglist[0] = channel;
+            arglist[1] = devName;
+            arglist[2] = new ActionListener() {
+
+                @Override
+                public void onSuccess() {
+                    Log.d(MainActivity.TAG, "setDeviceName succeeded");
+                }
+
+                @Override
+                public void onFailure(int reason) {
+                    Log.d(MainActivity.TAG, "setDeviceName failed");
+                }
+            };
+
+            setDeviceName.invoke(manager, arglist);
+
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
         }
 
     }

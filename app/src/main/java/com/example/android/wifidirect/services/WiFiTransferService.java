@@ -19,6 +19,8 @@ import com.example.android.wifidirect.activities.ImageDisplaying;
 import com.example.android.wifidirect.fragments.GroupOperationsFragment;
 
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -67,8 +69,6 @@ public class WiFiTransferService extends IntentService {
 
                 fileUri = intent.getExtras().getString(EXTRAS_FILE_PATH);
                 String ip = intent.getExtras().getString(EXTRAS_ADDRESS);
-
-
 
                 socket = new Socket();
 
@@ -180,9 +180,12 @@ public class WiFiTransferService extends IntentService {
                 }
 
 
+
             }
 
         }
+
+
     }
 
 
@@ -205,7 +208,7 @@ public class WiFiTransferService extends IntentService {
          */
         @Override
         public void onPostExecute(String result) {
-            if (result != null) {
+            if (result != null ) {
                 statusText.setText("Plik skopiowany - " + result);
                 Activity activity = (Activity) GroupOperationsFragment.mContentView.getContext();
                 intentP = new Intent(activity.getBaseContext(), ImageDisplaying.class);
@@ -253,32 +256,33 @@ public class WiFiTransferService extends IntentService {
         protected String doInBackground(Void... params) {
             ServerSocket serverSocket = null;
             Socket client = null;
-            try {
-                serverSocket = new ServerSocket(8988);
-                Log.d(MainActivity.TAG, "Serwer: Połączenie otwarto");
-                client = serverSocket.accept();
-                Log.d(MainActivity.TAG, "Serwer: Połączenie nawiązano");
-                InputStream inputStream = client.getInputStream();
 
-                f = new File(Environment.getExternalStorageDirectory() + "/"
-                        + context.getPackageName() + "/wifip2pshared-" + "temp"
-                        );
 
-                File dirs = new File(f.getParent());
-                if (!dirs.exists())
-                    dirs.mkdirs();
-                f.createNewFile();
+                try {
+                    serverSocket = new ServerSocket(8988);
+                    Log.d(MainActivity.TAG, "Serwer: Połączenie otwarto");
+                    client = serverSocket.accept();
+                    Log.d(MainActivity.TAG, "Serwer: Połączenie nawiązano");
+                    InputStream inputStream = client.getInputStream();
 
-                Log.d(MainActivity.TAG, "Serwer: Kopiowanie plików " + f.toString());
+                    f = new File(Environment.getExternalStorageDirectory() + "/"
+                            + context.getPackageName() + "/wifip2pshared-" + "temp"
+                            );
 
-                FileOutputStream outputStream = new FileOutputStream(f);
-                copyFile(inputStream, outputStream);
-                serverSocket.close();
-                return f.getAbsolutePath();
-            } catch (IOException e) {
-                Log.e(MainActivity.TAG, e.getMessage());
-            }
+                    File dirs = new File(f.getParent());
+                    if (!dirs.exists())
+                        dirs.mkdirs();
+                    f.createNewFile();
 
+                    Log.d(MainActivity.TAG, "Serwer: Kopiowanie plików " + f.toString());
+
+                    FileOutputStream outputStream = new FileOutputStream(f);
+                    copyFile(inputStream, outputStream);
+                    serverSocket.close();
+                    return f.getAbsolutePath();
+                } catch (IOException e) {
+                    Log.e(MainActivity.TAG, e.getMessage());
+                }
 
             return null;
         }

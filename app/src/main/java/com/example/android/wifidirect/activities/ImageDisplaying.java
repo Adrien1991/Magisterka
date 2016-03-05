@@ -101,9 +101,9 @@ public class ImageDisplaying extends Activity implements View.OnTouchListener {
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
         intentFilter.addAction(WiFiTransferService.ACTION_SEND_FILE);
-
         manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         channel = manager.initialize(this, getMainLooper(), null);
+
 
 
 
@@ -368,8 +368,7 @@ public class ImageDisplaying extends Activity implements View.OnTouchListener {
                                 FilenameUtils.getBaseName(xmlFilePath));
                         values.put(MediaStore.Files.FileColumns.MIME_TYPE, "text/*");
                         values.put("_data", xmlFilePath);
-                        getContentResolver().insert(
-                                MediaStore.Files.getContentUri("external"), values);
+                        getContentResolver().insert(MediaStore.Files.getContentUri("external"), values);
 
 
 

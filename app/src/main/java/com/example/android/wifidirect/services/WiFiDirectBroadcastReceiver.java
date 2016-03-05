@@ -19,6 +19,7 @@ import com.example.android.wifidirect.R;
 import com.example.android.wifidirect.fragments.GroupOperationsFragment;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -30,7 +31,6 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
     private Channel channel;
     private MainActivity activity;
     public static int liczbaPeerow;
-    public static Collection<WifiP2pDevice> peersArray;
 
     public WiFiDirectBroadcastReceiver(WifiP2pManager manager, Channel channel, MainActivity activity) {
         super();
@@ -102,7 +102,6 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
             public void onGroupInfoAvailable(WifiP2pGroup group) {
                     if(group != null) {
                     liczbaPeerow = group.getClientList().size();
-
                 }
             }
         });
