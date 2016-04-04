@@ -1,11 +1,11 @@
 apply plugin: 'com.android.application'
 android {
-    compileSdkVersion 21
+    compileSdkVersion 23
     buildToolsVersion "23.0.2"
 
     defaultConfig {
         applicationId "com.example.android.wifidirect"
-        minSdkVersion 17
+        minSdkVersion 16
         targetSdkVersion 19
     }
 
@@ -19,4 +19,5 @@ android {
 
 dependencies {
     compile 'org.apache.directory.studio:org.apache.commons.io:2.4'
+    compile 'com.android.support:support-v13:23.1.1'
 }

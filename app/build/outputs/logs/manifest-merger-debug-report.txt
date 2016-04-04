@@ -15,6 +15,8 @@ ADDED from C:\Users\User\AndroidStudioProjects\WiFiDirectDemo\app\src\main\Andro
 		ADDED from C:\Users\User\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:2:11-69
 uses-sdk
 ADDED from C:\Users\User\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:5:5-44
+MERGED from [com.android.support:support-v13:23.1.1] C:\Users\User\AndroidStudioProjects\WiFiDirectDemo\app\build\intermediates\exploded-aar\com.android.support\support-v13\23.1.1\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-v4:23.1.1] C:\Users\User\AndroidStudioProjects\WiFiDirectDemo\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.1.1\AndroidManifest.xml:20:5-43
 	android:targetSdkVersion
 		INJECTED from C:\Users\User\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml
 		INJECTED from C:\Users\User\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml
@@ -70,6 +72,8 @@ ADDED from C:\Users\User\AndroidStudioProjects\WiFiDirectDemo\app\src\main\Andro
 		ADDED from C:\Users\User\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:18:19-62
 application
 ADDED from C:\Users\User\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:20:5-53:19
+MERGED from [com.android.support:support-v13:23.1.1] C:\Users\User\AndroidStudioProjects\WiFiDirectDemo\app\build\intermediates\exploded-aar\com.android.support\support-v13\23.1.1\AndroidManifest.xml:22:5-20
+MERGED from [com.android.support:support-v4:23.1.1] C:\Users\User\AndroidStudioProjects\WiFiDirectDemo\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.1.1\AndroidManifest.xml:22:5-20
 	android:label
 		ADDED from C:\Users\User\AndroidStudioProjects\WiFiDirectDemo\app\src\main\AndroidManifest.xml:22:9-41
 	android:icon

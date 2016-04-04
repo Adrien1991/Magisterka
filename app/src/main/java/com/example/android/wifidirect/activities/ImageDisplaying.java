@@ -10,7 +10,6 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.os.Environment;
@@ -40,8 +39,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Objects;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -67,23 +64,21 @@ public class ImageDisplaying extends Activity implements View.OnTouchListener {
     private  BroadcastReceiver receiver = null;
     protected WifiP2pManager manager;
     protected final IntentFilter intentFilter = new IntentFilter();
+
+    private int myX;
+    private int myY;
+
     private int lewyNowy;
     private int prawyNowy;
     private int gornyNowy;
     private int dolnyNowy;
-    private Uri uriUltra;
-    private double widthScreenMaster = 0;
-    private double heightScreenMaster = 0;
-    private double widthScreenMultiplier;
-    private double heightScreenMultiplier;
     private Bitmap loadedImage;
-    private double xxHdpiValue = 500;
-    private double dpiStandarisation;
-    private double densityMaster;
+    private double xxHdpiValue = 160;
     private double densityStandarisation;
-    private double pictureStandarisation;
-    private String whereIm = "";
-    private int globalPosition;
+    public static int deviceID;
+
+    public static int numberOfPeers = 0;
+    private static String uriToLoad;
 
 
     @Override
@@ -96,6 +91,14 @@ public class ImageDisplaying extends Activity implements View.OnTouchListener {
         Constants._root = (ViewGroup) findViewById(R.id.root);
         Constants.jpgView.setOnTouchListener(this);
 
+        String myAdress = Constants.getDottedDecimalIP(Constants.getLocalIPAddress());
+
+        if(GroupOperationsFragment.info.isGroupOwner){
+            deviceID = 0;
+        }else {
+            deviceID = Integer.valueOf(myAdress.substring(myAdress.length()-1,myAdress.length())) + 1;
+        }
+
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
@@ -105,8 +108,6 @@ public class ImageDisplaying extends Activity implements View.OnTouchListener {
         channel = manager.initialize(this, getMainLooper(), null);
 
 
-
-
         //Sprawdzanie czy karta SD jest dostępna na urządzeniu
         if (!Environment.getExternalStorageState().equals(
                 Environment.MEDIA_MOUNTED)) {
@@ -114,150 +115,119 @@ public class ImageDisplaying extends Activity implements View.OnTouchListener {
                     .show();
         } else {
 
-                File jpg = new File(Environment.getExternalStorageDirectory() + "/" + WiFiTransferService.FileServerAsyncTask.context.getPackageName());
+            Intent intent = getIntent();
+            if (intent.hasExtra("uri")) {
+                uriToLoad = intent.getStringExtra("uri");
+            }
 
+            //Standaryzacja za PRAWDZIWĄ wartość gęstości piskela
+            densityStandarisation = (MainActivity.trueDpi / xxHdpiValue);
 
-                File[] listOfFiles = jpg.listFiles();
-                ArrayList listaJpg = new ArrayList();
+            loadedImage = BitmapFactory.decodeFile(uriToLoad);
 
-                for (File file : listOfFiles)
-                {
-                    if (file.getAbsolutePath().endsWith(".jpg"))
-                    {
-                        listaJpg.add(file);
-                    }
-
-                }
-
-//                if (listaJpg.size() > 3) {
-//                    for (int i = 0; i <= (listaJpg.size()-3); i++) {
-//                        listaJpg.remove(listaJpg.size()-1);
-//                    }
-//                }
-
-            loadedImage = BitmapFactory.decodeFile(listaJpg.get(listaJpg.size()-1).toString());
-
-            //Standaryzacja wymiarów obrazu do jednolitego
-            dpiStandarisation = MainActivity.trueDpi/xxHdpiValue;
-
-            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams((int) (loadedImage.getWidth()* dpiStandarisation), (int) (loadedImage.getHeight()* dpiStandarisation));
+            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams((int) (loadedImage.getWidth() * densityStandarisation), (int) (loadedImage.getHeight() * densityStandarisation));
             Constants.jpgView.setLayoutParams(lp);
 
             Constants.jpgView.setImageBitmap(loadedImage);
-            if(!GroupOperationsFragment.info.isGroupOwner){
-                 Constants.jpgView.setVisibility(View.INVISIBLE);
-             }
+            if (!GroupOperationsFragment.info.isGroupOwner) {
+                Constants.jpgView.setVisibility(View.INVISIBLE);
+            }
 
-            File file = new File(Environment.getExternalStorageDirectory() + "/" + WiFiTransferService.FileServerAsyncTask.context.getPackageName()+ "/" + "variables-received" +".xml");
-                if (file.exists()){
-                    try {
-                        InputStream is = new FileInputStream(file.getPath());
-                        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-                        DocumentBuilder db = dbf.newDocumentBuilder();
-                        Document doc = db.parse(new InputSource(is));
-                        doc.getDocumentElement().normalize();
+            File file = new File(Environment.getExternalStorageDirectory() + "/" + WiFiTransferService.FileServerAsyncTask.context.getPackageName() + "/" + "variables" + ".xml");
+            if (file.exists()) {
+                try {
+                    InputStream is = new FileInputStream(file.getPath());
+                    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                    DocumentBuilder db = dbf.newDocumentBuilder();
+                    Document doc = db.parse(new InputSource(is));
+                    doc.getDocumentElement().normalize();
 
-                        Element root = doc.getDocumentElement();
-                        NodeList items = root.getElementsByTagName("lewy_margines");
-                        Node item = items.item(0);
-                        lewyNowy = Integer.parseInt(item.getFirstChild().getNodeValue());
+                    Element root = doc.getDocumentElement();
 
-                        items = root.getElementsByTagName("prawy_margines");
+                    NodeList items = root.getElementsByTagName("device_x_" + String.valueOf(deviceID));
+                    Node item = items.item(0);
+                    myX = Integer.parseInt(item.getFirstChild().getNodeValue());
+
+                    items = root.getElementsByTagName("device_y_" + String.valueOf(deviceID));
+                    item = items.item(0);
+                    myY = Integer.parseInt(item.getFirstChild().getNodeValue());
+
+                    items = root.getElementsByTagName("lewy_margines");
+                    item = items.item(0);
+                    lewyNowy = Integer.parseInt(item.getFirstChild().getNodeValue());
+
+                    items = root.getElementsByTagName("prawy_margines");
+                    item = items.item(0);
+                    prawyNowy = Integer.parseInt(item.getFirstChild().getNodeValue());
+
+                    items = root.getElementsByTagName("gorny_margines");
+                    item = items.item(0);
+                    gornyNowy = Integer.parseInt(item.getFirstChild().getNodeValue());
+
+                    items = root.getElementsByTagName("dolny_margines");
+                    item = items.item(0);
+                    dolnyNowy = Integer.parseInt(item.getFirstChild().getNodeValue());
+
+                    if (!GroupOperationsFragment.info.isGroupOwner) {
+
+                        GroupOperationsFragment.xList.clear();
+                        GroupOperationsFragment.yList.clear();
+
+                        items = root.getElementsByTagName("peers");
                         item = items.item(0);
-                        prawyNowy = Integer.parseInt(item.getFirstChild().getNodeValue());
+                        numberOfPeers = Integer.parseInt(item.getFirstChild().getNodeValue());
 
-                        items = root.getElementsByTagName("gorny_margines");
-                        item = items.item(0);
-                        gornyNowy = Integer.parseInt(item.getFirstChild().getNodeValue());
+                        for (int i = 0; i <= numberOfPeers; i++) {
 
-                        items = root.getElementsByTagName("dolny_margines");
-                        item = items.item(0);
-                        dolnyNowy = Integer.parseInt(item.getFirstChild().getNodeValue());
+                            items = root.getElementsByTagName("device_x_" + String.valueOf(i));
+                            item = items.item(0);
+                            int tempX = Integer.parseInt(item.getFirstChild().getNodeValue());
 
-                        items = root.getElementsByTagName("width_screen_master");
-                        item = items.item(0);
-                        widthScreenMaster = Integer.parseInt((item.getFirstChild().getNodeValue()));
+                            GroupOperationsFragment.xList.add(tempX);
 
-                        items = root.getElementsByTagName("height_screen_master");
-                        item = items.item(0);
-                        heightScreenMaster = Integer.parseInt((item.getFirstChild().getNodeValue()));
+                            items = root.getElementsByTagName("device_y_" + String.valueOf(i));
+                            item = items.item(0);
+                            int tempY = Integer.parseInt(item.getFirstChild().getNodeValue());
 
-                        items = root.getElementsByTagName("density");
-                        item = items.item(0);
-                        densityMaster = Double.parseDouble(item.getFirstChild().getNodeValue());
+                            GroupOperationsFragment.yList.add(tempY);
 
-                        items = root.getElementsByTagName("deviceTag");
-                        item = items.item(0);
-                        whereIm = item.getFirstChild().getNodeValue();
-
-
-                    } catch (Exception e) {
-                        System.out.println("XML Pasing Excpetion = " + e);
+                        }
                     }
 
+
+                } catch (Exception e) {
+                    System.out.println("XML Pasing Excpetion = " + e);
                 }
 
-            if (!GroupOperationsFragment.info.isGroupOwner) {
-                String gOwnerIp = String.valueOf(GroupOperationsFragment.info.groupOwnerAddress);
-                gOwnerIp = gOwnerIp.substring(1);
-                String myPostion = (Constants.getDottedDecimalIP(Constants.getLocalIPAddress())).replace(gOwnerIp, "");
-                globalPosition = Integer.parseInt(myPostion) + 1;
-                Constants._root.invalidate();
-            }else{
-                globalPosition = 0;
             }
-//            File varChek = new File(Environment.getExternalStorageDirectory() + "/"
-//                    + this.getPackageName() + "/variables-received" + ".xml");
-//            if (varChek.exists()) varChek.delete();
-
+            Constants._root.invalidate();
         }
-
-
 
 
     }
 
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         receiver = new WiFiDirectBroadcastReceiver(manager, channel, MainActivity.activityMain);
         registerReceiver(receiver, intentFilter);
 
         File varChek = new File(Environment.getExternalStorageDirectory() + "/"
-                + this.getPackageName() + "/variables-received" + ".xml");
+                + this.getPackageName() + "/variables" + ".xml");
 
-        //Standaryzacja za zmianę ekranu z większego na mniejszy lub odwrotnie
-        widthScreenMultiplier = MainActivity.screenWidth / widthScreenMaster;
-        heightScreenMultiplier = MainActivity.screenHeight / heightScreenMaster;
 
-        //Standaryzacja za PRAWDZIWĄ wartość gęstości piskela
-        densityStandarisation =  MainActivity.trueDpi/densityMaster;
+        int lewyNowy2 = (int) ((lewyNowy - myX) * densityStandarisation);
+        int prawyNowy2 = (int) ((prawyNowy - myX) * densityStandarisation);
 
-        //Drobna rekompensata za utratę pikseli przy zaokrąglaniu
-        pictureStandarisation = loadedImage.getWidth() * 0.00625;
-
-        if (whereIm.length() > 2) {
-            if (Objects.equals(Character.toString(whereIm.charAt((globalPosition * 2) + 1)), "R")) {
-                // Wyliczanie nowych marginesów dla obrazu na urządzeniu biorcy, po prawej
-                lewyNowy = (int) ((lewyNowy - widthScreenMaster) * densityStandarisation);
-                prawyNowy = (int) ((prawyNowy - widthScreenMaster) * densityStandarisation);
-                gornyNowy = (int) (gornyNowy * densityStandarisation);
-                dolnyNowy = (int) (dolnyNowy * densityStandarisation);
-            } else if (Objects.equals(Character.toString(whereIm.charAt((globalPosition * 2) + 1)), "L")) {
-                // Wyliczanie nowych marginesów dla obrazu na urządzeniu biorcy, po lewej
-                lewyNowy = (int) ((lewyNowy * densityStandarisation) + MainActivity.screenWidth);
-                prawyNowy = (int) ((prawyNowy * densityStandarisation) + MainActivity.screenWidth);
-                gornyNowy = (int) (gornyNowy * dpiStandarisation);
-                dolnyNowy = (int) (dolnyNowy * dpiStandarisation);
-            }
-        }
+        int gornyNowy2 = (int) ((gornyNowy + myY) * densityStandarisation);
+        int dolnyNowy2 = (int) ((dolnyNowy + myY) * densityStandarisation);
 
 
         if (varChek.exists()){
             Constants.jpgView.setVisibility(View.VISIBLE);
 
-            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams((int) (loadedImage.getWidth()* dpiStandarisation), (int) (loadedImage.getHeight() * dpiStandarisation));
-            lp.setMargins(lewyNowy, gornyNowy, prawyNowy, dolnyNowy);
+            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams((int) (loadedImage.getWidth()* densityStandarisation), (int) (loadedImage.getHeight() * densityStandarisation));
+            lp.setMargins(lewyNowy2, gornyNowy2, prawyNowy2, dolnyNowy2);
             Constants.jpgView.setLayoutParams(lp);
             Constants._root.invalidate();
 
@@ -303,9 +273,14 @@ public class ImageDisplaying extends Activity implements View.OnTouchListener {
                     Constants.lewy = layoutParams.leftMargin = X - _xDelta;
                     Constants.gorny = layoutParams.topMargin = Y - _yDelta;
                     Constants.prawy = layoutParams.rightMargin = Constants.lewy + imageRight;
-                    //  Constants.prawy = Constants.prawy -2147483645;
                     Constants.dolny = layoutParams.bottomMargin = Constants.gorny + imageBottom;
                     view.setLayoutParams(layoutParams);
+
+                    int lewyXML = (int)((Constants.lewy/densityStandarisation) + myX);
+                    int prawyXML = (int)((Constants.prawy/densityStandarisation)+ myX);
+
+                    int gornyXML = (int)((Constants.gorny/densityStandarisation) - myY);
+                    int dolnyXML = (int)((Constants.dolny/densityStandarisation)- myY);
 
                     try {
 
@@ -317,40 +292,48 @@ public class ImageDisplaying extends Activity implements View.OnTouchListener {
                         Element root = xmlVariables.createElement("variables");
                         xmlVariables.appendChild(root);
 
-                        Element deviceTag = xmlVariables.createElement("deviceTag");
-                        deviceTag.appendChild(xmlVariables.createTextNode(String.valueOf(GroupOperationsFragment.peersTag)));
-                        root.appendChild(deviceTag);
+                        for (int i=0; i < GroupOperationsFragment.xList.size(); i++){
+
+                            Element elementX = xmlVariables.createElement("device_x_" + String.valueOf(i));
+                            elementX.appendChild(xmlVariables.createTextNode(String.valueOf(GroupOperationsFragment.xList.get(i))));
+                            root.appendChild(elementX);
+
+                            Element elementY = xmlVariables.createElement("device_y_" + String.valueOf(i));
+                            elementY.appendChild(xmlVariables.createTextNode(String.valueOf(GroupOperationsFragment.yList.get(i))));
+                            root.appendChild(elementY);
+
+
+                        }
 
                         Element lewyMargines = xmlVariables.createElement("lewy_margines");
-                        lewyMargines.appendChild(xmlVariables.createTextNode(String.valueOf(Constants.lewy)));
+                        lewyMargines.appendChild(xmlVariables.createTextNode(String.valueOf(lewyXML)));
                         root.appendChild(lewyMargines);
 
                         Element prawyMargines = xmlVariables.createElement("prawy_margines");
-                        prawyMargines.appendChild(xmlVariables.createTextNode(String.valueOf(Constants.prawy)));
+                        prawyMargines.appendChild(xmlVariables.createTextNode(String.valueOf(prawyXML)));
                         root.appendChild(prawyMargines);
 
                         Element gornyMargines = xmlVariables.createElement("gorny_margines");
-                        gornyMargines.appendChild(xmlVariables.createTextNode(String.valueOf(Constants.gorny)));
+                        gornyMargines.appendChild(xmlVariables.createTextNode(String.valueOf(gornyXML)));
                         root.appendChild(gornyMargines);
 
                         Element dolnyMargines = xmlVariables.createElement("dolny_margines");
-                        dolnyMargines.appendChild(xmlVariables.createTextNode(String.valueOf(Constants.dolny)));
+                        dolnyMargines.appendChild(xmlVariables.createTextNode(String.valueOf(dolnyXML)));
                         root.appendChild(dolnyMargines);
 
-                        Element densityMaster = xmlVariables.createElement("density");
-                        densityMaster.appendChild(xmlVariables.createTextNode(String.valueOf(MainActivity.trueDpi)));
-                        root.appendChild(densityMaster);
+                        if (GroupOperationsFragment.info.isGroupOwner){
 
-                        Element widthScreenMaster = xmlVariables.createElement("width_screen_master");
-                        widthScreenMaster.appendChild(xmlVariables.createTextNode(String.valueOf(MainActivity.screenWidth)));
-                        root.appendChild(widthScreenMaster);
+                            Element numberPeers = xmlVariables.createElement("peers");
+                            numberPeers.appendChild(xmlVariables.createTextNode(String.valueOf(WiFiDirectBroadcastReceiver.liczbaPeerow)));
+                            root.appendChild(numberPeers);
 
-                        Element heightScreenMaster= xmlVariables.createElement("height_screen_master");
-                        heightScreenMaster.appendChild(xmlVariables.createTextNode(String.valueOf(MainActivity.screenHeight)));
-                        root.appendChild(heightScreenMaster);
+                        }else{
 
-                        // create the xml file
-                        // transform the DOM Object to an XML File
+                            Element numberPeers = xmlVariables.createElement("peers");
+                            numberPeers.appendChild(xmlVariables.createTextNode(String.valueOf(numberOfPeers)));
+                            root.appendChild(numberPeers);
+
+                        }
 
                         TransformerFactory transformerFactory = TransformerFactory.newInstance();
                         Transformer transformer = transformerFactory.newTransformer();
@@ -383,18 +366,6 @@ public class ImageDisplaying extends Activity implements View.OnTouchListener {
 
                     Uri mFilesUri = MediaStore.Files.getContentUri("external");
 
-//                    Cursor cursor = getContentResolver().query(
-//                            mFilesUri,
-//                            new String[]{MediaStore.Files.FileColumns._ID},
-//                            MediaStore.Files.FileColumns.DISPLAY_NAME + "=?",
-//                            new String[]{"variables.xml"}, null);
-//
-//                    if (cursor != null && cursor.moveToFirst()) {
-//                        id = cursor.getInt(cursor
-//                                .getColumnIndex(MediaStore.Files.FileColumns._ID));
-//                    }
-
-
                     Cursor cursor = getContentResolver().query(
                             mFilesUri,
                             new String[]{MediaStore.Files.FileColumns._ID},
@@ -410,7 +381,7 @@ public class ImageDisplaying extends Activity implements View.OnTouchListener {
                         cursor.close();
                     }
 
-                    uriUltra = Uri.withAppendedPath(mFilesUri, "" + id);
+                    Uri uriUltra = Uri.withAppendedPath(mFilesUri, "" + id);
 
                     serviceIntent = new Intent(ImageDisplaying.this, WiFiTransferService.class);
                     serviceIntent.setAction(WiFiTransferService.ACTION_SEND_FILE);
@@ -430,7 +401,6 @@ public class ImageDisplaying extends Activity implements View.OnTouchListener {
 
         return true;
     }
-
 
 
 }

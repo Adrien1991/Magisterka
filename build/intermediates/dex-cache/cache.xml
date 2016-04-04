@@ -2,11 +2,18 @@
 <items version="2" >
 
     <item
-        jar="C:\Users\User\.gradle\caches\modules-2\files-2.1\commons-io\commons-io\2.4\b1b6ea3b7e4aa4f492509a4952029cd8e48019ad\commons-io-2.4.jar"
+        jar="C:\Users\User\AndroidStudioProjects\WiFiDirectDemo\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-basement\8.1.0\jars\classes.jar"
         jumboMode="false"
         revision="23.0.2"
-        sha1="b1b6ea3b7e4aa4f492509a4952029cd8e48019ad">
-        <dex dex="C:\Users\User\AndroidStudioProjects\WiFiDirectDemo\app\build\intermediates\pre-dexed\debug\commons-io-2.4-080e925fcaa9be7433ec347d87b23740a0dd3162.jar" />
+        sha1="d0dda274b703dd9c5bb056867649d22b4171ae7d">
+        <dex dex="C:\Users\User\AndroidStudioProjects\WiFiDirectDemo\app\build\intermediates\pre-dexed\debug\classes-eb1f1239b4ff1402954a3015719dc015df309b2d.jar" />
+    </item>
+    <item
+        jar="C:\Users\User\AndroidStudioProjects\WiFiDirectDemo\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-appindexing\8.1.0\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="4477ea44f5ec5ad064022a22691732d7638ff197">
+        <dex dex="C:\Users\User\AndroidStudioProjects\WiFiDirectDemo\app\build\intermediates\pre-dexed\debug\classes-e4e3680456b508ea6e0bd02c7c71dce839e9fe55.jar" />
     </item>
 
 </items>

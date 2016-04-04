@@ -9,7 +9,14 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.RectF;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ScaleDrawable;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pManager;
@@ -20,6 +27,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.Settings;
+import android.support.v4.widget.DrawerLayout;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
@@ -29,8 +37,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.android.wifidirect.interfaces.DeviceActionListener;
@@ -64,21 +75,33 @@ public class MainActivity extends Activity implements ChannelListener, DeviceAct
     public final Activity activity = this;
     public static MainActivity activityMain;
 
+    private DrawerLayout mDrawerLayout;
+    private ListView mDrawerList;
+
 
     protected final IntentFilter intentFilter = new IntentFilter();
     protected static Channel channel;
     private  BroadcastReceiver receiver = null;
     public static double trueDpi;
-    public static float scaleFactor;
+    public static int scaleFactor;
+    public static double scaledDpi;
+    public static double trueDpi2;
 
     public void setIsWifiP2pEnabled(boolean isWifiP2pEnabled) {
         this.isWifiP2pEnabled = isWifiP2pEnabled;
     }
 
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+
+
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+
 
         activityMain = this;
 
@@ -106,14 +129,15 @@ public class MainActivity extends Activity implements ChannelListener, DeviceAct
         float widthDpi = metrics.xdpi;
         float heightDpi = metrics.ydpi;
 
-        scaleFactor = metrics.density;
+        scaleFactor = (int) metrics.density;
         trueDpi = (widthDpi+heightDpi)/2;
+        trueDpi2 = trueDpi/160;
 
+        trueDpi2 = Math.floor(trueDpi2 * 1000) / 1000;
 
-        setDeviceName(android.os.Build.MODEL + "|" + String.valueOf(screenWidth) + "|" + String.valueOf(screenHeight));
+        setDeviceName(android.os.Build.MODEL +"|"+ String.valueOf(trueDpi2) + "|" + String.valueOf(screenWidth) + "|" + String.valueOf(screenHeight));
 
     }
-
 
     /** Rejestracja BroadcastReceivera
      */
@@ -125,13 +149,6 @@ public class MainActivity extends Activity implements ChannelListener, DeviceAct
 
 
 
-
-        File varChek = new File(Environment.getExternalStorageDirectory() + "/"
-                + this.getPackageName() + "/variables" + ".xml");
-        if (varChek.exists()) varChek.delete();
-        varChek = new File(Environment.getExternalStorageDirectory() + "/"
-                + this.getPackageName() + "/variables-received" + ".xml");
-        if (varChek.exists()) varChek.delete();
 
     }
 
@@ -249,7 +266,10 @@ public class MainActivity extends Activity implements ChannelListener, DeviceAct
 
             @Override
             public void onSuccess() {
-
+                GroupOperationsFragment.clusterScreenHeight = 0;
+                GroupOperationsFragment.clusterScreenWidth = 0;
+                if (!GroupOperationsFragment.xList.isEmpty() && GroupOperationsFragment.xList.size() > 1)GroupOperationsFragment.xList.clear();
+                if (!GroupOperationsFragment.yList.isEmpty() && GroupOperationsFragment.yList.size() > 1)GroupOperationsFragment.yList.clear();
 
                 fragment.getView().setVisibility(View.GONE);
 

@@ -83,6 +83,8 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                         .getFragmentManager().findFragmentById(R.id.frag_detail);
                 manager.requestConnectionInfo(channel, fragment);
             } else {
+//
+
                 // rozlaczenie uslugi
                 activity.resetData();
             }
@@ -95,12 +97,10 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
         }
 
 
-
-
         manager.requestGroupInfo(channel, new WifiP2pManager.GroupInfoListener() {
             @Override
             public void onGroupInfoAvailable(WifiP2pGroup group) {
-                    if(group != null) {
+                if (group != null) {
                     liczbaPeerow = group.getClientList().size();
                 }
             }

@@ -6,6 +6,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.net.wifi.p2p.WifiP2pDevice;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
@@ -30,6 +31,8 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.security.acl.Group;
+import java.util.List;
 
 /**
  * Servis wysylajacy pliki poprzez socket WiFI
@@ -44,6 +47,7 @@ public class WiFiTransferService extends IntentService {
     private int i;
     public static String fileUri = "destination_uri";
     private Socket socket;
+    private int ilosc;
 
     public WiFiTransferService(String name) {
         super(name);
@@ -59,74 +63,148 @@ public class WiFiTransferService extends IntentService {
 
         Context context = getApplicationContext();
 
-        int ilosc = WiFiDirectBroadcastReceiver.liczbaPeerow;
+        if (GroupOperationsFragment.info.isGroupOwner) {
+            ilosc = WiFiDirectBroadcastReceiver.liczbaPeerow;
+        }else {
+            ilosc = ImageDisplaying.numberOfPeers;
+        }
+
+        if (!GroupOperationsFragment.info.isGroupOwner) {
+            //pętla iterujaca po wszystkich mozliwych peerach
+            for (i = 0; i < ilosc; i++) {
+                if ((intent.getAction().equals(ACTION_SEND_FILE)) && (i != (ImageDisplaying.deviceID-1))) {
 
 
-        //pętla iterujaca po wszystkich mozliwych peerach
-        for (i = 0; i <= (ilosc - 1); i++) {
-            if (intent.getAction().equals(ACTION_SEND_FILE)) {
+                    fileUri = intent.getExtras().getString(EXTRAS_FILE_PATH);
+                    String ip = intent.getExtras().getString(EXTRAS_ADDRESS);
+
+                    socket = new Socket();
 
 
-                fileUri = intent.getExtras().getString(EXTRAS_FILE_PATH);
-                String ip = intent.getExtras().getString(EXTRAS_ADDRESS);
-
-                socket = new Socket();
-
-
-                int port = intent.getExtras().getInt(EXTRAS_PORT);
-
-
-                try {
-                    Log.d(MainActivity.TAG, "Otwieranie połączenia - ");
-                    socket.bind(null);
-
-
-                    //Iterowanie po ip w sieci (admina + peerów)
-                    ip = ip + Integer.toString(i);
-
-                    InetSocketAddress socketAdres = new InetSocketAddress(ip, port);
-                    socket.connect((socketAdres), SOCKET_TIMEOUT);
-                    if (ip.length() > 12) {
-                        ip = ip.substring(0, (ip.length() - Integer.toString(i).length()));
-                    }
-
-
-                    Log.d(MainActivity.TAG, "Połączenie - " + socket.isConnected());
-                    OutputStream stream = socket.getOutputStream();
-                    ContentResolver cr = context.getContentResolver();
-                    InputStream is = null;
+                    int port = intent.getExtras().getInt(EXTRAS_PORT);
 
 
                     try {
-                        is = cr.openInputStream(Uri.parse(fileUri));
-                    } catch (FileNotFoundException e) {
-                        Log.d(MainActivity.TAG, e.toString());
-                    }
-                    WiFiTransferService.FileServerAsyncTask.copyFile(is, stream);
+                        Log.d(MainActivity.TAG, "Otwieranie połączenia - ");
+                        socket.bind(null);
 
-                    Log.d(MainActivity.TAG, "Zapisano dane");
-                } catch (IOException e) {
-                    Log.e(MainActivity.TAG, e.getMessage());
-                } finally {
-                    if (socket != null) {
-                        if (socket.isConnected()) {
-                            try {
 
-                                socket.close();
-                            } catch (IOException e) {
-                                // Give up
-                                e.printStackTrace();
+                        //Iterowanie po ip w sieci (admina + peerów)
+                        ip = ip + Integer.toString(i);
+
+                        InetSocketAddress socketAdres = new InetSocketAddress(ip, port);
+                        socket.connect((socketAdres), SOCKET_TIMEOUT);
+                        if (ip.length() > 12) {
+                            ip = ip.substring(0, (ip.length() - Integer.toString(i).length()));
+                        }
+
+
+                        Log.d(MainActivity.TAG, "Połączenie - " + socket.isConnected());
+                        OutputStream stream = socket.getOutputStream();
+                        ContentResolver cr = context.getContentResolver();
+                        InputStream is = null;
+
+
+                        try {
+                            is = cr.openInputStream(Uri.parse(fileUri));
+                        } catch (FileNotFoundException e) {
+                            Log.d(MainActivity.TAG, e.toString());
+                        }
+                        WiFiTransferService.FileServerAsyncTask.copyFile(is, stream);
+
+                        Log.d(MainActivity.TAG, "Zapisano dane");
+                    } catch (IOException e) {
+                        Log.e(MainActivity.TAG, e.getMessage());
+                    } finally {
+                        if (socket != null) {
+                            if (socket.isConnected()) {
+                                try {
+
+                                    socket.close();
+                                } catch (IOException e) {
+                                    // Give up
+                                    e.printStackTrace();
+                                }
                             }
                         }
+
                     }
+
+
+                }
+
+
+            }
+        }else {
+            for (i = 0; i < ilosc; i++) {
+                if (intent.getAction().equals(ACTION_SEND_FILE)) {
+
+
+                    fileUri = intent.getExtras().getString(EXTRAS_FILE_PATH);
+                    String ip = intent.getExtras().getString(EXTRAS_ADDRESS);
+
+                    socket = new Socket();
+
+
+                    int port = intent.getExtras().getInt(EXTRAS_PORT);
+
+
+                    try {
+                        Log.d(MainActivity.TAG, "Otwieranie połączenia - ");
+                        socket.bind(null);
+
+
+                        //Iterowanie po ip w sieci (admina + peerów)
+                        ip = ip + Integer.toString(i);
+
+                        InetSocketAddress socketAdres = new InetSocketAddress(ip, port);
+                        socket.connect((socketAdres), SOCKET_TIMEOUT);
+                        if (ip.length() > 12) {
+                            ip = ip.substring(0, (ip.length() - Integer.toString(i).length()));
+                        }
+
+
+                        Log.d(MainActivity.TAG, "Połączenie - " + socket.isConnected());
+                        OutputStream stream = socket.getOutputStream();
+                        ContentResolver cr = context.getContentResolver();
+                        InputStream is = null;
+
+
+                        try {
+                            is = cr.openInputStream(Uri.parse(fileUri));
+                        } catch (FileNotFoundException e) {
+                            Log.d(MainActivity.TAG, e.toString());
+                        }
+                        WiFiTransferService.FileServerAsyncTask.copyFile(is, stream);
+
+                        Log.d(MainActivity.TAG, "Zapisano dane");
+                    } catch (IOException e) {
+                        Log.e(MainActivity.TAG, e.getMessage());
+                    } finally {
+                        if (socket != null) {
+                            if (socket.isConnected()) {
+                                try {
+
+                                    socket.close();
+                                } catch (IOException e) {
+                                    // Give up
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+
+                    }
+
 
                 }
 
 
             }
 
-
         }
+
+
+
 
         if (!GroupOperationsFragment.info.isGroupOwner) {
 
@@ -212,29 +290,25 @@ public class WiFiTransferService extends IntentService {
                 statusText.setText("Plik skopiowany - " + result);
                 Activity activity = (Activity) GroupOperationsFragment.mContentView.getContext();
                 intentP = new Intent(activity.getBaseContext(), ImageDisplaying.class);
-                intentP.setData(Uri.parse("file://" + result));
-                intentP.putExtra(result, Uri.parse("file://" + result));
                 intentP.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 File file = new File(Environment.getExternalStorageDirectory() + "/"
                         + context.getPackageName() + "/wifip2pshared-" + "temp");
                 long weight = file.length();
-                if (weight > 512){
+                if (weight > 1024){
                     file = new File(Environment.getExternalStorageDirectory() + "/"
                             + context.getPackageName() + "/wifip2pshared-" + "temp");
                     result = (Environment.getExternalStorageDirectory() + "/"
                             + context.getPackageName() + "/wifip2pshared-" + System.currentTimeMillis() + ".jpg");
                     file.renameTo(new File(result));
                     intentP.setData(Uri.parse("file://" + result));
-                    intentP.putExtra(result, Uri.parse("file://" + result));
+                    intentP.putExtra("uri", result);
                     context.startActivity(intentP);
                 }else{
                     file = new File(Environment.getExternalStorageDirectory() + "/"
                             + context.getPackageName() + "/wifip2pshared-" + "temp");
                     result = (Environment.getExternalStorageDirectory() + "/"
-                            + context.getPackageName() + "/variables-received" + ".xml");
+                            + context.getPackageName() + "/variables" + ".xml");
                     file.renameTo(new File(result));
-                    intentP.setData(Uri.parse("file://" + result));
-                    intentP.putExtra(result, Uri.parse("file://" + result));
                     context.startActivity(intentP);
                 }
 
