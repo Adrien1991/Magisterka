@@ -28,6 +28,7 @@ import android.net.Uri;
 import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
+import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager.ConnectionInfoListener;
 import android.os.Bundle;
@@ -335,6 +336,7 @@ public class GroupOperationsFragment extends Fragment implements ConnectionInfoL
                                     "Podłączanie do :" + device.deviceAddress, true, true
                             );
                             ((DeviceActionListener) getActivity()).connect(config);
+
 
 
 
@@ -912,8 +914,6 @@ public class GroupOperationsFragment extends Fragment implements ConnectionInfoL
         }
         this.info = info;
         this.getView().setVisibility(View.VISIBLE);
-
-        String xmlFilePath = Environment.getExternalStorageDirectory() + "/" + getActivity().getPackageName()+ "/" + "screenSize" + ".xml";
 
         TextView view = (TextView) mContentView.findViewById(R.id.group_owner);
         view.setText(getResources().getString(R.string.group_owner_text)

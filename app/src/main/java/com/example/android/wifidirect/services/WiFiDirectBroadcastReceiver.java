@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.net.NetworkInfo;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pGroup;
+import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
@@ -82,6 +83,17 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                 GroupOperationsFragment fragment = (GroupOperationsFragment) activity
                         .getFragmentManager().findFragmentById(R.id.frag_detail);
                 manager.requestConnectionInfo(channel, fragment);
+
+                new WifiP2pManager.ConnectionInfoListener() {
+
+                    @Override
+                    public void onConnectionInfoAvailable(
+                            WifiP2pInfo info) {
+                        if (info != null) {
+                            activity.setConnectionInfo(info); // When connection is established with other device, We can find that info from wifiP2pInfo here.
+                        }
+                    }
+                };
             } else {
 //
 
@@ -97,6 +109,8 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
         }
 
 
+
+
         manager.requestGroupInfo(channel, new WifiP2pManager.GroupInfoListener() {
             @Override
             public void onGroupInfoAvailable(WifiP2pGroup group) {
@@ -105,7 +119,13 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                 }
             }
         });
+
+
+
+
     }
+
+
 
 
 }

@@ -72,7 +72,7 @@ public class ImageDisplaying extends Activity implements View.OnTouchListener {
     private int prawyNowy;
     private int gornyNowy;
     private int dolnyNowy;
-    private Bitmap loadedImage;
+    private static Bitmap loadedImage;
     private double xxHdpiValue = 160;
     private double densityStandarisation;
     public static int deviceID;
@@ -118,17 +118,17 @@ public class ImageDisplaying extends Activity implements View.OnTouchListener {
             Intent intent = getIntent();
             if (intent.hasExtra("uri")) {
                 uriToLoad = intent.getStringExtra("uri");
+                loadedImage = BitmapFactory.decodeFile(uriToLoad);
             }
 
             //Standaryzacja za PRAWDZIWĄ wartość gęstości piskela
             densityStandarisation = (MainActivity.trueDpi / xxHdpiValue);
 
-            loadedImage = BitmapFactory.decodeFile(uriToLoad);
-
             RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams((int) (loadedImage.getWidth() * densityStandarisation), (int) (loadedImage.getHeight() * densityStandarisation));
             Constants.jpgView.setLayoutParams(lp);
 
             Constants.jpgView.setImageBitmap(loadedImage);
+
             if (!GroupOperationsFragment.info.isGroupOwner) {
                 Constants.jpgView.setVisibility(View.INVISIBLE);
             }
@@ -200,7 +200,6 @@ public class ImageDisplaying extends Activity implements View.OnTouchListener {
                 }
 
             }
-            Constants._root.invalidate();
         }
 
 
@@ -391,12 +390,12 @@ public class ImageDisplaying extends Activity implements View.OnTouchListener {
                     serviceIntent.putExtra(WiFiTransferService.EXTRAS_PORT, 8988);
                     serviceIntent.setType("text/*");
 
+
+
                     ImageDisplaying.this.startService(serviceIntent);
 
                     break;
             }
-
-            Constants._root.invalidate();
 
 
         return true;

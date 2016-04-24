@@ -19,6 +19,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ScaleDrawable;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
+import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.ActionListener;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
@@ -44,6 +45,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.example.android.wifidirect.Constants;
 import com.example.android.wifidirect.interfaces.DeviceActionListener;
 import com.example.android.wifidirect.fragments.DeviceListFragment;
 import com.example.android.wifidirect.R;
@@ -135,6 +137,7 @@ public class MainActivity extends Activity implements ChannelListener, DeviceAct
 
         trueDpi2 = Math.floor(trueDpi2 * 1000) / 1000;
 
+
         setDeviceName(android.os.Build.MODEL +"|"+ String.valueOf(trueDpi2) + "|" + String.valueOf(screenWidth) + "|" + String.valueOf(screenHeight));
 
     }
@@ -146,9 +149,6 @@ public class MainActivity extends Activity implements ChannelListener, DeviceAct
         super.onResume();
         receiver = new WiFiDirectBroadcastReceiver(manager, channel, this);
         registerReceiver(receiver, intentFilter);
-
-
-
 
     }
 
@@ -268,10 +268,15 @@ public class MainActivity extends Activity implements ChannelListener, DeviceAct
             public void onSuccess() {
                 GroupOperationsFragment.clusterScreenHeight = 0;
                 GroupOperationsFragment.clusterScreenWidth = 0;
-                if (!GroupOperationsFragment.xList.isEmpty() && GroupOperationsFragment.xList.size() > 1)GroupOperationsFragment.xList.clear();
-                if (!GroupOperationsFragment.yList.isEmpty() && GroupOperationsFragment.yList.size() > 1)GroupOperationsFragment.yList.clear();
+                if (!GroupOperationsFragment.xList.isEmpty() && GroupOperationsFragment.xList.size() > 1)
+                    GroupOperationsFragment.xList.clear();
+                if (!GroupOperationsFragment.yList.isEmpty() && GroupOperationsFragment.yList.size() > 1)
+                    GroupOperationsFragment.yList.clear();
 
                 fragment.getView().setVisibility(View.GONE);
+
+                Toast.makeText(MainActivity.this, "Uwaga! Sieć rozłączona.",
+                        Toast.LENGTH_LONG).show();
 
             }
 
@@ -368,5 +373,7 @@ public class MainActivity extends Activity implements ChannelListener, DeviceAct
     }
 
 
+    public void setConnectionInfo(WifiP2pInfo info) {
 
+    }
 }

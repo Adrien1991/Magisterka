@@ -20,6 +20,7 @@ import com.example.android.wifidirect.activities.ImageDisplaying;
 import com.example.android.wifidirect.fragments.GroupOperationsFragment;
 
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -27,8 +28,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.acl.Group;
@@ -87,6 +90,7 @@ public class WiFiTransferService extends IntentService {
                     try {
                         Log.d(MainActivity.TAG, "Otwieranie połączenia - ");
                         socket.bind(null);
+
 
 
                         //Iterowanie po ip w sieci (admina + peerów)
@@ -226,6 +230,7 @@ public class WiFiTransferService extends IntentService {
 
                     InetSocketAddress socketAdres = new InetSocketAddress(ip, port);
                     socket.connect((socketAdres), SOCKET_TIMEOUT);
+
 
                     Log.d(MainActivity.TAG, "Połączenie - " + socket.isConnected());
                     OutputStream stream = socket.getOutputStream();
@@ -378,6 +383,7 @@ public class WiFiTransferService extends IntentService {
             }
             return true;
         }
+
 
 
 
